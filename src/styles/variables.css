@@ -1,0 +1,81 @@
+/* ====================================
+   公众号排版工具 - CSS 变量系统
+   ==================================== */
+
+:root {
+  /* 主题色彩 - 浅色模式（黑白灰页面背景） */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e8e8e8;
+  --bg-editor: #fafafa;
+
+  /* 文字颜色 - 严禁纯黑 */
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-tertiary: #8c8c8c;
+  --text-inverse: #ffffff;
+
+  /* 强调色 - 保留彩色按钮 */
+  --accent-primary: #10a37f;
+  --accent-hover: #0d8a6a;
+  --accent-subtle: rgba(16, 163, 127, 0.1);
+
+  /* 边框与分隔 */
+  --border-color: #d9d9d9;
+  --border-subtle: #f0f0f0;
+
+  /* 排版参数 - 知乎专家建议 */
+  --title-font-size: 17px;
+  --body-font-size: 15px;
+  --note-font-size: 13px;
+  --line-height: 1.75;
+  --letter-spacing: 0.5px;
+  --paragraph-margin: 15px;
+
+  /* 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  /* 过渡 */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s ease;
+}
+
+/* 深色主题 - 页面黑白灰，按钮保留彩色 */
+[data-theme="dark"] {
+  --bg-primary: #0d0d0d;
+  --bg-secondary: #151515;
+  --bg-tertiary: #1f1f1f;
+  --bg-editor: #141414;
+
+  --text-primary: #e8e8e8;
+  --text-secondary: #a3a3a3;
+  --text-tertiary: #666666;
+  --text-inverse: #0d0d0d;
+
+  --accent-primary: #10a37f;
+  --accent-hover: #1ec99e;
+  --accent-subtle: rgba(16, 163, 127, 0.15);
+
+  --border-color: #2a2a2a;
+  --border-subtle: #1f1f1f;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
