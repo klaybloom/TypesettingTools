@@ -31,6 +31,17 @@
           </svg>
           {{ copySuccess ? '已复制' : '复制' }}
         </button>
+
+        <button 
+          class="action-btn" 
+          @click="exportImage"
+          :disabled="!formattedContent"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path fill="currentColor" d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
+          </svg>
+          导出图片
+        </button>
         
         <button class="icon-btn" @click="toggleTheme" :title="theme === 'dark' ? '浅色' : '深色'">
           <svg v-if="theme === 'dark'" viewBox="0 0 24 24" width="18" height="18">
@@ -54,6 +65,7 @@
         <Editor 
           v-model="rawContent" 
           placeholder="粘贴文章内容，支持 Markdown..."
+          @scroll="onEditorScroll"
         />
       </section>
 
@@ -75,8 +87,10 @@
           </div>
         </div>
         <Preview 
+          ref="previewRef"
           :content="formattedContent" 
           :mode="previewMode"
+          :scrollRatio="scrollRatio"
         />
       </section>
     </main>
@@ -104,6 +118,7 @@ import Editor from './components/Editor.vue'
 import Preview from './components/Preview.vue'
 import StylePanel from './components/StylePanel.vue'
 import { formatText, inlineStyles } from './utils/formatter.js'
+import { defaultSettings } from './utils/config.js'
 
 // 主题状态
 const theme = ref('light')
@@ -116,16 +131,11 @@ const previewMode = ref('mobile')
 const showStylePanel = ref(false)
 const copySuccess = ref(false)
 const toast = ref({ show: false, message: '', type: 'success' })
+const scrollRatio = ref(0)
+const previewRef = ref(null)
 
-// 样式设置
-const styleSettings = ref({
-  fontSize: 15,
-  lineHeight: 1.75,
-  letterSpacing: 0.5,
-  textColor: '#262626',
-  accentColor: '#10a37f',
-  paragraphMargin: 15
-})
+// 样式设置（从统一配置加载）
+const styleSettings = ref({ ...defaultSettings })
 
 // 计算属性 - 自动排版：内容或样式变化时自动更新
 const formattedContent = computed(() => {
@@ -197,11 +207,46 @@ function showToast(message, type = 'success') {
 
 // 点击空白处关闭样式面板
 function handleGlobalClick(e) {
-  // 如果点击的不是样式面板内部，关闭面板
   if (showStylePanel.value && !e.target.closest('.style-panel')) {
     showStylePanel.value = false
   }
 }
+
+// 编辑器滚动同步
+function onEditorScroll(ratio) {
+  scrollRatio.value = ratio
+}
+
+// 导出图片
+async function exportImage() {
+  const previewEl = previewRef.value?.previewContentRef
+  if (!previewEl) {
+    showToast('导出失败：无法获取预览区域', 'error')
+    return
+  }
+  try {
+    showToast('正在生成图片...', 'success')
+    const html2canvas = (await import('html2canvas')).default
+    const canvas = await html2canvas(previewEl, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      logging: false
+    })
+    const link = document.createElement('a')
+    link.download = `typesetting-${Date.now()}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+    showToast('图片已导出', 'success')
+  } catch (err) {
+    showToast('导出失败：' + err.message, 'error')
+  }
+}
+
+// 持久化样式设置到 localStorage
+watch(styleSettings, (val) => {
+  localStorage.setItem('styleSettings', JSON.stringify(val))
+}, { deep: true })
 
 // 初始化
 onMounted(() => {
@@ -210,6 +255,15 @@ onMounted(() => {
     theme.value = savedTheme
   } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
     theme.value = 'light'
+  }
+
+  // 恢复保存的样式设置
+  const savedSettings = localStorage.getItem('styleSettings')
+  if (savedSettings) {
+    try {
+      const parsed = JSON.parse(savedSettings)
+      styleSettings.value = { ...defaultSettings, ...parsed }
+    } catch (_) { /* ignore corrupt data */ }
   }
 })
 </script>

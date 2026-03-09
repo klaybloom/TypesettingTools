@@ -14,6 +14,7 @@
             </div>
           </div>
           <div 
+            ref="previewContentRef"
             class="preview-content wechat-style"
             v-html="content || emptyState"
           ></div>
@@ -23,6 +24,7 @@
     
     <div v-else class="preview-desktop">
       <div 
+        ref="previewContentRef"
         class="preview-content wechat-style"
         v-html="content || emptyState"
       ></div>
@@ -31,7 +33,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 
 const props = defineProps({
   content: {
@@ -42,15 +44,34 @@ const props = defineProps({
     type: String,
     default: 'mobile',
     validator: (v) => ['mobile', 'desktop'].includes(v)
+  },
+  scrollRatio: {
+    type: Number,
+    default: 0
   }
 })
+
+const previewContentRef = ref(null)
+
+// Sync scroll from editor
+watch(() => props.scrollRatio, (ratio) => {
+  const el = previewContentRef.value
+  if (!el) return
+  const maxScroll = el.scrollHeight - el.clientHeight
+  if (maxScroll > 0) {
+    el.scrollTop = ratio * maxScroll
+  }
+})
+
+// Expose ref for parent (e.g., export image)
+defineExpose({ previewContentRef })
 
 const emptyState = computed(() => `
   <div class="empty-preview">
     <svg viewBox="0 0 24 24" width="48" height="48">
       <path fill="currentColor" opacity="0.3" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/>
     </svg>
-    <p>点击「一键排版」预览效果</p>
+    <p>在左侧输入 Markdown 即可实时预览</p>
   </div>
 `)
 </script>

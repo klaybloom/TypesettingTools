@@ -5,6 +5,24 @@
         <span class="panel-title">样式设置</span>
       </div>
       <div class="panel-content">
+        <!-- 主题预设 -->
+        <div class="setting-group">
+          <label>主题预设</label>
+          <div class="preset-cards">
+            <button
+              v-for="preset in themePresets"
+              :key="preset.name"
+              class="preset-card"
+              :class="{ active: isPresetActive(preset) }"
+              :style="{ '--preset-color': preset.settings.accentColor }"
+              @click="applyPreset(preset)"
+            >
+              <span class="preset-dot"></span>
+              <span class="preset-name">{{ preset.name }}</span>
+            </button>
+          </div>
+        </div>
+
         <div class="setting-group">
           <label>字体大小</label>
           <div class="setting-control">
@@ -81,6 +99,21 @@
         </div>
         
         <div class="setting-group">
+          <label>首行缩进</label>
+          <div class="setting-control">
+            <label class="switch">
+              <input 
+                type="checkbox" 
+                :checked="settings.textIndent"
+                @change="updateSetting('textIndent', $event.target.checked)"
+              />
+              <span class="switch-slider"></span>
+            </label>
+            <span class="setting-value">{{ settings.textIndent ? '开启' : '关闭' }}</span>
+          </div>
+        </div>
+
+        <div class="setting-group">
           <label>段落间距</label>
           <div class="setting-control">
             <input 
@@ -104,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { defaultSettings, textColors, accentColors, themePresets } from '../utils/config.js'
 
 const props = defineProps({
   settings: {
@@ -119,33 +152,18 @@ const props = defineProps({
 
 const emit = defineEmits(['update:settings', 'toggle'])
 
-// 推荐颜色
-const textColors = [
-  { name: '深墨', value: '#262626' },
-  { name: '墨灰', value: '#3f3f3f' },
-  { name: '炭灰', value: '#595959' },
-  { name: '中灰', value: '#8c8c8c' }
-]
-
-const accentColors = [
-  { name: '翡翠绿', value: '#10a37f' },
-  { name: '科技蓝', value: '#1a73e8' },
-  { name: '活力橙', value: '#ff6b35' },
-  { name: '优雅紫', value: '#7c3aed' },
-  { name: '玫瑰红', value: '#e11d48' }
-]
-
 function updateSetting(key, value) {
   emit('update:settings', { ...props.settings, [key]: value })
 }
 
-const defaultSettings = {
-  fontSize: 15,
-  lineHeight: 1.75,
-  letterSpacing: 0.5,
-  textColor: '#262626',
-  accentColor: '#10a37f',
-  paragraphMargin: 15
+function applyPreset(preset) {
+  emit('update:settings', { ...preset.settings })
+}
+
+function isPresetActive(preset) {
+  const s = props.settings
+  const p = preset.settings
+  return s.accentColor === p.accentColor && s.textColor === p.textColor && s.fontSize === p.fontSize && s.textIndent === p.textIndent
 }
 
 function resetSettings() {
@@ -272,6 +290,94 @@ function resetSettings() {
 
 .reset-btn:hover {
   background: var(--accent-subtle);
+}
+
+/* 主题预设卡片 */
+.preset-cards {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.preset-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.preset-card:hover {
+  border-color: var(--preset-color);
+}
+
+.preset-card.active {
+  border-color: var(--preset-color);
+  background: color-mix(in srgb, var(--preset-color) 10%, var(--bg-tertiary));
+}
+
+.preset-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--preset-color);
+  flex-shrink: 0;
+}
+
+.preset-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* 开关组件 */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg-tertiary);
+  border-radius: 20px;
+  transition: all var(--transition-fast);
+}
+
+.switch-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 2px;
+  bottom: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.switch input:checked + .switch-slider {
+  background: var(--accent-primary);
+}
+
+.switch input:checked + .switch-slider::before {
+  transform: translateX(16px);
   color: var(--accent-primary);
 }
 

@@ -40,6 +40,9 @@
       <button class="toolbar-btn icon-only" @click="insertFormat('italic')" title="斜体 Ctrl+I">
         <span class="btn-text italic">I</span>
       </button>
+      <button class="toolbar-btn icon-only" @click="insertFormat('strikethrough')" title="删除线 Ctrl+Shift+X">
+        <span class="btn-text strikethrough">S</span>
+      </button>
       <button class="toolbar-btn icon-only" @click="insertFormat('quote')" title="引用">
         <svg viewBox="0 0 24 24" width="14" height="14">
           <path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
@@ -85,6 +88,18 @@
           <path fill="currentColor" d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
         </svg>
       </button>
+      <button class="toolbar-btn icon-only" @click="triggerImageUpload" title="插入图片">
+        <svg viewBox="0 0 24 24" width="14" height="14">
+          <path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+        </svg>
+      </button>
+      <input
+        ref="imageInputRef"
+        type="file"
+        accept="image/*"
+        style="display: none"
+        @change="handleImageUpload"
+      />
     </div>
     
     <!-- 编辑器 -->
@@ -96,13 +111,15 @@
         :placeholder="placeholder"
         @input="handleInput"
         @keydown="handleKeydown"
+        @paste="handlePaste"
+        @scroll="handleScroll"
         @click="closeMenus"
         spellcheck="false"
       ></textarea>
     </div>
     
     <div class="editor-footer">
-      <span class="editor-hint">Markdown: **粗体** | *斜体* | > 引用 | - 列表 | `代码`</span>
+      <span class="editor-hint">⌘B 粗体 | ⌘I 斜体 | ⌘⇧X 删除线 | ⌘⇧K 代码块 | ⌘⇧Q 引用 | ⌘L 链接 | 支持粘贴图片</span>
     </div>
   </div>
 </template>
@@ -115,8 +132,9 @@ const props = defineProps({
   placeholder: { type: String, default: '在此输入内容...' }
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'scroll'])
 const textareaRef = ref(null)
+const imageInputRef = ref(null)
 const showHeadingMenu = ref(false)
 const showTodoMenu = ref(false)
 
@@ -139,19 +157,85 @@ function handleInput(e) {
   emit('update:modelValue', e.target.value)
 }
 
+function handleScroll() {
+  const ta = textareaRef.value
+  if (!ta) return
+  const maxScroll = ta.scrollHeight - ta.clientHeight
+  const ratio = maxScroll > 0 ? ta.scrollTop / maxScroll : 0
+  emit('scroll', ratio)
+}
+
 function handleKeydown(e) {
+  const mod = e.ctrlKey || e.metaKey
   if (e.key === 'Tab') {
     e.preventDefault()
     insertAtCursor('    ')
   }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+  if (mod && !e.shiftKey && e.key === 'b') {
     e.preventDefault()
     insertFormat('bold')
   }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+  if (mod && !e.shiftKey && e.key === 'i') {
     e.preventDefault()
     insertFormat('italic')
   }
+  if (mod && e.shiftKey && e.key === 'X') {
+    e.preventDefault()
+    insertFormat('strikethrough')
+  }
+  if (mod && e.shiftKey && e.key === 'K') {
+    e.preventDefault()
+    insertFormat('codeblock')
+  }
+  if (mod && e.shiftKey && e.key === 'Q') {
+    e.preventDefault()
+    insertFormat('quote')
+  }
+  if (mod && !e.shiftKey && e.key === 'l') {
+    e.preventDefault()
+    insertFormat('link')
+  }
+}
+
+// 处理粘贴事件 - 检测剪贴板中的图片
+function handlePaste(e) {
+  const items = e.clipboardData?.items
+  if (!items) return
+
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault()
+      const file = item.getAsFile()
+      if (file) convertImageToBase64AndInsert(file)
+      return
+    }
+  }
+}
+
+// 工具栏图片上传按钮
+function triggerImageUpload() {
+  imageInputRef.value?.click()
+}
+
+function handleImageUpload(e) {
+  const file = e.target.files?.[0]
+  if (file && file.type.startsWith('image/')) {
+    convertImageToBase64AndInsert(file)
+  }
+  // 重置 input 以允许重复选择同一文件
+  e.target.value = ''
+}
+
+// 将图片转为 base64 并插入 Markdown 图片语法
+function convertImageToBase64AndInsert(file) {
+  const reader = new FileReader()
+  reader.onload = (event) => {
+    const base64 = event.target.result
+    const fileName = file.name || '图片'
+    const markdownImg = `\n![${fileName}](${base64})\n`
+    insertAtCursor(markdownImg)
+  }
+  reader.readAsDataURL(file)
 }
 
 function insertAtCursor(text) {
@@ -194,6 +278,7 @@ function insertFormat(type) {
     case 'codeblock': before = '```\n'; after = '\n```'; placeholder = '代码'; break
     case 'table': before = '| 列1 | 列2 |\n| --- | --- |\n| '; after = ' |  |'; placeholder = '内容'; break
     case 'link': before = '['; after = '](url)'; placeholder = '链接'; break
+    case 'strikethrough': before = '~~'; after = '~~'; placeholder = '删除线'; break
     case 'divider': before = '\n---\n'; placeholder = ''; break
   }
   
@@ -280,6 +365,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 .btn-text.bold { font-weight: 700; }
 .btn-text.italic { font-style: italic; font-family: Georgia, serif; }
+.btn-text.strikethrough { text-decoration: line-through; }
 
 .toolbar-divider {
   width: 1px;
