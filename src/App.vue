@@ -38,7 +38,7 @@
           :disabled="!formattedContent"
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
-            <path fill="currentColor" d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
+            <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
           </svg>
           导出图片
         </button>
@@ -217,7 +217,7 @@ function onEditorScroll(ratio) {
   scrollRatio.value = ratio
 }
 
-// 导出图片
+// 导出图片（长截图）
 async function exportImage() {
   const previewEl = previewRef.value?.previewContentRef
   if (!previewEl) {
@@ -225,14 +225,47 @@ async function exportImage() {
     return
   }
   try {
-    showToast('正在生成图片...', 'success')
+    showToast('正在生成长截图...', 'success')
+
+    // 收集需要临时展开的滚动容器
+    const scrollAncestors = []
+    let el = previewEl
+    while (el) {
+      const style = window.getComputedStyle(el)
+      const ov = style.overflow + style.overflowY
+      if (/auto|scroll|hidden/.test(ov)) {
+        scrollAncestors.push({
+          el,
+          overflow: el.style.overflow,
+          overflowY: el.style.overflowY,
+          height: el.style.height,
+          maxHeight: el.style.maxHeight,
+        })
+        el.style.overflow = 'visible'
+        el.style.overflowY = 'visible'
+        el.style.height = 'auto'
+        el.style.maxHeight = 'none'
+      }
+      el = el.parentElement
+    }
+
     const html2canvas = (await import('html2canvas')).default
     const canvas = await html2canvas(previewEl, {
       backgroundColor: '#ffffff',
       scale: 2,
       useCORS: true,
-      logging: false
+      logging: false,
+      windowHeight: previewEl.scrollHeight,
     })
+
+    // 恢复所有容器原始样式
+    scrollAncestors.forEach(({ el, overflow, overflowY, height, maxHeight }) => {
+      el.style.overflow = overflow
+      el.style.overflowY = overflowY
+      el.style.height = height
+      el.style.maxHeight = maxHeight
+    })
+
     const link = document.createElement('a')
     link.download = `typesetting-${Date.now()}.png`
     link.href = canvas.toDataURL('image/png')
