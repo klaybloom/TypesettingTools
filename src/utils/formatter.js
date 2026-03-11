@@ -68,7 +68,9 @@ function getStyles(settings) {
         // 列表
         ul: `margin: 16px 0; padding-left: 24px;`,
         ol: `margin: 16px 0; padding-left: 24px;`,
-        li: `margin-bottom: 8px; color: ${settings.textColor};`,
+        li: `margin-bottom: 4px; color: ${settings.textColor};`,
+        // 列表项内的段落（去掉额外 margin）
+        liParagraph: `margin: 0; text-align: justify;${settings.textIndent ? ' text-indent: 2em;' : ''}`,
         // 粗体
         strong: `color: ${settings.accentColor}; font-weight: 700;`,
         // 斜体
@@ -160,8 +162,22 @@ function createRenderer(settings) {
 
     // --- 自定义 Renderer Rules ---
 
-    // 段落
-    md.renderer.rules.paragraph_open = () => `<p style="${styles.p}">`
+    // 段落（判断是否在列表项内，在列表项内时去掉多余 margin）
+    md.renderer.rules.paragraph_open = (tokens, idx) => {
+        // 向前查找，判断是否嵌套在 list_item 内
+        let isInsideListItem = false
+        for (let i = idx - 1; i >= 0; i--) {
+            if (tokens[i].type === 'list_item_open') {
+                isInsideListItem = true
+                break
+            }
+            if (tokens[i].type === 'list_item_close' || tokens[i].type === 'bullet_list_close' || tokens[i].type === 'ordered_list_close') {
+                break
+            }
+        }
+        const style = isInsideListItem ? styles.liParagraph : styles.p
+        return `<p style="${style}">`
+    }
     md.renderer.rules.paragraph_close = () => '</p>\n'
 
     // 标题
