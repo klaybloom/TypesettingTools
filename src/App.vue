@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container" :data-theme="theme" @click="handleGlobalClick">
+  <div class="app-container" :data-theme="theme" :data-mode="colorMode">
     <!-- 顶部导航栏 -->
     <header class="app-header">
       <div class="header-brand">
@@ -42,15 +42,40 @@
           </svg>
           导出图片
         </button>
-        
-        <button class="icon-btn" @click="toggleTheme" :title="theme === 'dark' ? '浅色' : '深色'">
-          <svg v-if="theme === 'dark'" viewBox="0 0 24 24" width="18" height="18">
-            <path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/>
-          </svg>
-          <svg v-else viewBox="0 0 24 24" width="18" height="18">
-            <path fill="currentColor" d="M9.37 5.51A7.35 7.35 0 009.1 7.5c0 4.08 3.32 7.4 7.4 7.4.68 0 1.35-.09 1.99-.27A7.014 7.014 0 0112 19c-3.86 0-7-3.14-7-7 0-2.93 1.81-5.45 4.37-6.49zM12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
-          </svg>
-        </button>
+        <div class="theme-dropdown" @click.stop>
+          <button class="icon-btn" @click="toggleThemeMenu" :title="'当前风格: ' + themeName">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+            </svg>
+          </button>
+          
+          <Transition name="pop">
+            <div class="theme-menu dropdown-menu" v-show="showThemeMenu">
+              <div class="menu-group-title">外观模式</div>
+              <button @click="setColorMode('light')" :class="{ active: colorMode === 'light' }">
+                <span class="menu-icon">☀️</span> 浅色模式
+              </button>
+              <button @click="setColorMode('dark')" :class="{ active: colorMode === 'dark' }">
+                <span class="menu-icon">🌒</span> 深色模式
+              </button>
+              
+              <div class="menu-divider"></div>
+              
+              <div class="menu-group-title">主题风格</div>
+              <button @click="changeTheme('default')" :class="{ active: theme === 'default' }"><span class="menu-icon">🎨</span> 默认配色</button>
+              <button @click="changeTheme('notion')" :class="{ active: theme === 'notion' }"><span class="menu-icon">📝</span> 象牙暖 (Notion)</button>
+              <button @click="changeTheme('vercel')" :class="{ active: theme === 'vercel' }"><span class="menu-icon">⬛</span> 极简灰 (Vercel)</button>
+              <button @click="changeTheme('linear')" :class="{ active: theme === 'linear' }"><span class="menu-icon">🌌</span> 极光紫 (Linear)</button>
+              <button @click="changeTheme('macaron')" :class="{ active: theme === 'macaron' }"><span class="menu-icon">🍬</span> 马卡龙 (Macaron)</button>
+              <div class="menu-divider"></div>
+              
+              <div class="menu-group-title">撞色 & 炫光</div>
+              <button @click="changeTheme('cyberpunk')" :class="{ active: theme === 'cyberpunk' }"><span class="menu-icon">🦿</span> 赛博朋克 (Cyberpunk)</button>
+              <button @click="changeTheme('retro')" :class="{ active: theme === 'retro' }"><span class="menu-icon">📼</span> 迈阿密复古 (Retro)</button>
+              <button @click="changeTheme('neon')" :class="{ active: theme === 'neon' }"><span class="menu-icon">⚡</span> 霓虹青紫 (Neon)</button>
+            </div>
+          </Transition>
+        </div>
       </div>
     </header>
 
@@ -100,7 +125,6 @@
       v-model:settings="styleSettings"
       :visible="showStylePanel"
       @toggle="showStylePanel = !showStylePanel"
-      @click.stop
     />
 
     <!-- Toast 提示 -->
@@ -113,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import Editor from './components/Editor.vue'
 import Preview from './components/Preview.vue'
 import StylePanel from './components/StylePanel.vue'
@@ -121,7 +145,8 @@ import { formatText, inlineStyles } from './utils/formatter.js'
 import { defaultSettings } from './utils/config.js'
 
 // 主题状态
-const theme = ref('light')
+const theme = ref('default')
+const colorMode = ref('light')
 
 // 内容状态
 const rawContent = ref('')
@@ -129,6 +154,7 @@ const rawContent = ref('')
 // UI 状态
 const previewMode = ref('mobile')
 const showStylePanel = ref(false)
+const showThemeMenu = ref(false)
 const copySuccess = ref(false)
 const toast = ref({ show: false, message: '', type: 'success' })
 const scrollRatio = ref(0)
@@ -146,10 +172,41 @@ const formattedContent = computed(() => {
 const hasContent = computed(() => rawContent.value.trim().length > 0)
 const charCount = computed(() => rawContent.value.replace(/\s/g, '').length)
 
+const themeName = computed(() => {
+  const map = {
+    default: '默认',
+    notion: '象牙暖',
+    vercel: '极简灰',
+    linear: '极光紫',
+    macaron: '马卡龙',
+    cyberpunk: '赛博朋克',
+    retro: '迈阿密',
+    neon: '霓虹青'
+  }
+  return map[theme.value] || '默认'
+})
+
 // 方法
-function toggleTheme() {
-  theme.value = theme.value === 'dark' ? 'light' : 'dark'
-  localStorage.setItem('theme', theme.value)
+function setColorMode(mode) {
+  colorMode.value = mode
+  localStorage.setItem('colorMode', mode)
+}
+
+// 方法
+function toggleThemeMenu() {
+  showThemeMenu.value = !showThemeMenu.value
+}
+
+function changeTheme(newTheme) {
+  theme.value = newTheme
+  localStorage.setItem('theme', newTheme)
+  showThemeMenu.value = false
+}
+
+function closeGlobalMenus(e) {
+  if (!e.target.closest('.theme-dropdown')) {
+    showThemeMenu.value = false
+  }
 }
 
 async function copyHtml() {
@@ -205,12 +262,7 @@ function showToast(message, type = 'success') {
   setTimeout(() => toast.value.show = false, 2500)
 }
 
-// 点击空白处关闭样式面板
-function handleGlobalClick(e) {
-  if (showStylePanel.value && !e.target.closest('.style-panel')) {
-    showStylePanel.value = false
-  }
-}
+// （已移除点击空白处关闭样式面板逻辑，改为常驻推挤排版）
 
 // 编辑器滚动同步
 function onEditorScroll(ratio) {
@@ -283,12 +335,7 @@ watch(styleSettings, (val) => {
 
 // 初始化
 onMounted(() => {
-  const savedTheme = localStorage.getItem('theme')
-  if (savedTheme) {
-    theme.value = savedTheme
-  } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-    theme.value = 'light'
-  }
+
 
   // 恢复保存的样式设置
   const savedSettings = localStorage.getItem('styleSettings')
@@ -298,6 +345,33 @@ onMounted(() => {
       styleSettings.value = { ...defaultSettings, ...parsed }
     } catch (_) { /* ignore corrupt data */ }
   }
+
+  // 恢复主题和深浅模式
+  const savedTheme = localStorage.getItem('theme') || 'default'
+  const savedMode = localStorage.getItem('colorMode')
+
+  if (savedMode) {
+    colorMode.value = savedMode
+    theme.value = ['light', 'dark'].includes(savedTheme) ? 'default' : savedTheme
+  } else {
+    // 兼容旧版本设置
+    if (savedTheme === 'dark') {
+      colorMode.value = 'dark'
+      theme.value = 'default'
+    } else if (savedTheme === 'light') {
+      colorMode.value = 'light'
+      theme.value = 'default'
+    } else {
+      theme.value = savedTheme
+      colorMode.value = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    }
+  }
+
+  document.addEventListener('click', closeGlobalMenus)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeGlobalMenus)
 })
 </script>
 
@@ -310,17 +384,27 @@ onMounted(() => {
   background: var(--bg-primary);
 }
 
-/* 顶部导航 */
 .app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 20px;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
+  padding: 12px 24px;
+  background: transparent;
+  border-bottom: 1px solid var(--border-subtle);
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+.app-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg-primary);
+  opacity: 0.85;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: -1;
 }
 
 .header-brand {
@@ -359,9 +443,15 @@ onMounted(() => {
   transition: all 0.15s;
 }
 
-.action-btn:hover {
-  background: var(--bg-hover);
+.action-btn:hover:not(:disabled) {
+  background: var(--bg-tertiary);
   color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.action-btn:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .action-btn.active {
@@ -397,6 +487,11 @@ onMounted(() => {
 .icon-btn:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
 }
 
 /* 主内容区 */
@@ -404,8 +499,9 @@ onMounted(() => {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--border-color);
+  gap: 24px;
+  padding: 24px;
+  background: var(--bg-secondary);
   overflow: hidden;
 }
 
@@ -414,6 +510,9 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
@@ -421,9 +520,9 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 12px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
 }
 
 .section-title {
@@ -483,6 +582,85 @@ onMounted(() => {
 .toast-leave-to {
   opacity: 0;
   transform: translateX(-50%) translateY(10px);
+}
+
+/* 主题下拉菜单相关 */
+.theme-dropdown {
+  position: relative;
+}
+
+.theme-dropdown .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  z-index: 200;
+  min-width: 160px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-dropdown .dropdown-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.theme-dropdown .dropdown-menu button:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+}
+
+.theme-dropdown .dropdown-menu button.active {
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+.menu-icon {
+  width: 20px;
+  text-align: center;
+}
+
+.menu-group-title {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  padding: 4px 12px;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
+.pop-enter-active,
+.pop-leave-active {
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  transform-origin: top right;
+}
+.pop-enter-from,
+.pop-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
 }
 
 @media (max-width: 1024px) {

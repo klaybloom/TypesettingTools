@@ -89,13 +89,15 @@ const emptyState = computed(() => `
 
 /* 手机模拟器 */
 .device-frame {
-  width: 375px;
+  width: 380px;
   background: #000;
-  border-radius: 40px;
-  padding: 12px;
+  border-radius: 46px;
+  padding: 10px;
   box-shadow: 
-    0 0 0 2px #333,
-    0 20px 50px rgba(0,0,0,0.3);
+    0 0 0 1px #333,
+    0 10px 20px rgba(0,0,0,0.1),
+    0 30px 60px rgba(0,0,0,0.15),
+    inset 0 0 4px rgba(255,255,255,0.2);
 }
 
 .device-notch {
@@ -113,19 +115,21 @@ const emptyState = computed(() => `
   top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
+  width: 50px;
   height: 6px;
   background: #1a1a1a;
   border-radius: 3px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .device-screen {
   background: #fff;
-  border-radius: 28px;
+  border-radius: 36px;
   overflow: hidden;
-  height: 600px;
+  height: 620px;
   display: flex;
   flex-direction: column;
+  box-shadow: inset 0 0 2px rgba(0,0,0,0.2);
 }
 
 .wechat-header {

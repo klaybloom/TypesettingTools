@@ -1,10 +1,15 @@
 <template>
-  <Transition name="slide">
-    <div v-show="visible" class="style-panel">
-      <div class="panel-header">
-        <span class="panel-title">样式设置</span>
-      </div>
-      <div class="panel-content">
+  <div class="style-panel-container" :class="{ 'is-visible': visible }">
+    <Transition name="fade">
+      <div v-if="visible" class="panel-overlay" @click="$emit('toggle')"></div>
+    </Transition>
+    
+    <Transition name="slide">
+      <div v-if="visible" class="style-panel" @click.stop>
+        <div class="panel-header">
+          <span class="panel-title">样式设置</span>
+        </div>
+        <div class="panel-content">
         <!-- 主题预设 -->
         <div class="setting-group">
           <label>主题预设</label>
@@ -128,12 +133,15 @@
           </div>
         </div>
         
-        <button class="reset-btn" @click="resetSettings">
-          恢复默认设置
-        </button>
+        <div class="setting-group">
+          <button class="reset-btn" @click="resetSettings" title="恢复为知乎推荐的最佳参数">
+            恢复默认排版
+          </button>
+        </div>
       </div>
     </div>
   </Transition>
+  </div>
 </template>
 
 <script setup>
@@ -172,16 +180,34 @@ function resetSettings() {
 </script>
 
 <style scoped>
-.style-panel {
+.style-panel-container {
   position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.style-panel-container.is-visible {
+  pointer-events: auto;
+}
+
+.panel-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.style-panel {
+  position: absolute;
   right: 0;
-  top: 40px;
+  top: 0;
   bottom: 0;
-  width: 260px;
-  background: var(--bg-secondary);
+  width: 320px;
+  background: var(--bg-primary);
   border-left: 1px solid var(--border-color);
-  box-shadow: -4px 0 20px rgba(0,0,0,0.08);
-  z-index: 50;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
 }
@@ -384,12 +410,22 @@ function resetSettings() {
 /* 过渡动画 */
 .slide-enter-active,
 .slide-leave-active {
-  transition: all var(--transition-normal);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .slide-enter-from,
 .slide-leave-to {
   opacity: 0;
-  transform: translateX(20px);
+  transform: translateX(100%);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

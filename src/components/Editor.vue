@@ -10,11 +10,13 @@
             <path fill="currentColor" d="M7 10l5 5 5-5z"/>
           </svg>
         </button>
-        <div class="dropdown-menu" v-show="showHeadingMenu">
-          <button @click="insertFormat('h1')"><span class="menu-icon">H1</span> 一级标题</button>
-          <button @click="insertFormat('h2')"><span class="menu-icon">H2</span> 二级标题</button>
-          <button @click="insertFormat('h3')"><span class="menu-icon">H3</span> 三级标题</button>
-        </div>
+        <Transition name="pop">
+          <div class="dropdown-menu" v-show="showHeadingMenu">
+            <button @click="insertFormat('h1')"><span class="menu-icon">H1</span> 一级标题</button>
+            <button @click="insertFormat('h2')"><span class="menu-icon">H2</span> 二级标题</button>
+            <button @click="insertFormat('h3')"><span class="menu-icon">H3</span> 三级标题</button>
+          </div>
+        </Transition>
       </div>
 
       <!-- 待办下拉
@@ -334,14 +336,19 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all var(--transition-fast);
   min-width: 28px;
   height: 28px;
 }
 
 .toolbar-btn:hover {
-  background: var(--accent-subtle);
+  background: var(--bg-tertiary);
   color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.toolbar-btn:active {
+  transform: scale(0.92);
 }
 
 .toolbar-btn.icon-only {
@@ -427,6 +434,18 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   margin: 6px 0;
 }
 
+/* 弹出菜单动画 */
+.pop-enter-active,
+.pop-leave-active {
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  transform-origin: top left;
+}
+.pop-enter-from,
+.pop-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
 .editor-container {
   flex: 1;
   display: flex;
@@ -447,6 +466,13 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   font-size: 14px;
   line-height: 1.6;
   caret-color: var(--accent-primary);
+  box-shadow: inset 0 0 0 1px transparent;
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.editor-textarea:focus {
+  box-shadow: inset 0 0 0 1px var(--accent-primary);
+  background: var(--bg-primary);
 }
 
 .editor-textarea::placeholder { color: var(--text-tertiary); }

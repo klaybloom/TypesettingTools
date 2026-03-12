@@ -20,9 +20,9 @@
   --accent-hover: #0d8a6a;
   --accent-subtle: rgba(16, 163, 127, 0.1);
 
-  /* 边框与分隔 */
-  --border-color: #d9d9d9;
-  --border-subtle: #f0f0f0;
+  /* 边框与分隔, 使用 rgba 融入不同层级的背景 */
+  --border-color: rgba(0, 0, 0, 0.12);
+  --border-subtle: rgba(0, 0, 0, 0.06);
 
   /* 排版参数 - 知乎专家建议 */
   --title-font-size: 17px;
@@ -45,19 +45,19 @@
   --radius-md: 10px;
   --radius-lg: 16px;
 
-  /* 阴影 */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  /* 阴影 - 现代多层柔软阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 15px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.05), 0 20px 25px rgba(0, 0, 0, 0.1);
 
-  /* 过渡 */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s ease;
-  --transition-slow: 0.4s ease;
+  /* 过渡 - 丝滑动效曲线 */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 深色主题 - 页面黑白灰，按钮保留彩色 */
-[data-theme="dark"] {
+[data-mode="dark"] {
   --bg-primary: #0d0d0d;
   --bg-secondary: #151515;
   --bg-tertiary: #1f1f1f;
@@ -72,10 +72,302 @@
   --accent-hover: #1ec99e;
   --accent-subtle: rgba(16, 163, 127, 0.15);
 
-  --border-color: #2a2a2a;
-  --border-subtle: #1f1f1f;
+  --border-color: rgba(255, 255, 255, 0.12);
+  --border-subtle: rgba(255, 255, 255, 0.06);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3), 0 10px 15px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4), 0 20px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* 象牙暖 (Notion 风格) - 适合长时间阅读和写作 */
+[data-theme="notion"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f6f3;
+  --bg-tertiary: #edece9;
+  --bg-editor: #ffffff;
+
+  --text-primary: #37352f;
+  --text-secondary: #787774;
+  --text-tertiary: #9c9b98;
+  --text-inverse: #ffffff;
+
+  --accent-primary: #ea7271;
+  --accent-hover: #d35f5f;
+  --accent-subtle: rgba(234, 114, 113, 0.12);
+
+  --border-color: rgba(55, 53, 47, 0.16);
+  --border-subtle: rgba(55, 53, 47, 0.06);
+}
+
+[data-theme="notion"][data-mode="dark"] {
+  --bg-primary: #191919;
+  --bg-secondary: #202020;
+  --bg-tertiary: #2a2a2a;
+  --bg-editor: #191919;
+
+  --text-primary: #e0e0e0;
+  --text-secondary: #9b9b9b;
+  --text-tertiary: #737373;
+  --text-inverse: #ffffff;
+
+  --accent-primary: #ea7271;
+  --accent-hover: #ff8584;
+  --accent-subtle: rgba(234, 114, 113, 0.2);
+
+  --border-color: rgba(255, 255, 255, 0.12);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+}
+
+/* 极简灰 (Vercel 风格) - 纯正黑白 */
+[data-theme="vercel"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-tertiary: #eaeaea;
+  --bg-editor: #ffffff;
+
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --text-tertiary: #888888;
+  --text-inverse: #ffffff;
+
+  --accent-primary: #000000;
+  --accent-hover: #333333;
+  --accent-subtle: rgba(0, 0, 0, 0.08);
+
+  --border-color: rgba(0, 0, 0, 0.15);
+  --border-subtle: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="vercel"][data-mode="dark"] {
+  --bg-primary: #000000;
+  --bg-secondary: #111111;
+  --bg-tertiary: #222222;
+  --bg-editor: #000000;
+
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: #666666;
+  --text-inverse: #000000;
+
+  --accent-primary: #ffffff;
+  --accent-hover: #cccccc;
+  --accent-subtle: rgba(255, 255, 255, 0.15);
+
+  --border-color: rgba(255, 255, 255, 0.15);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+}
+
+/* 极光紫 (Linear 风格) - 深色神秘极客感 */
+[data-theme="linear"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f5f8;
+  --bg-tertiary: #ebecf0;
+  --bg-editor: #ffffff;
+
+  --text-primary: #1f232b;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --text-inverse: #ffffff;
+
+  --accent-primary: #5e6ad2;
+  --accent-hover: #4b55c9;
+  --accent-subtle: rgba(94, 106, 210, 0.1);
+
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-subtle: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="linear"][data-mode="dark"] {
+  --bg-primary: #0e0f11;
+  --bg-secondary: #17181c;
+  --bg-tertiary: #23252a;
+  --bg-editor: #0e0f11;
+
+  --text-primary: #f2f2f3;
+  --text-secondary: #8a8f98;
+  --text-tertiary: #60646c;
+  --text-inverse: #000000;
+
+  --accent-primary: #5e6ad2;
+  --accent-hover: #6975e8;
+  --accent-subtle: rgba(94, 106, 210, 0.2);
+
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+}
+
+/* 马卡龙 (Macaron 风格) - 糖果粉彩，活泼可爱 */
+[data-theme="macaron"] {
+  --bg-primary: #fffcfd;
+  --bg-secondary: #fff5f8;
+  --bg-tertiary: #ffe4eb;
+  --bg-editor: #ffffff;
+
+  --text-primary: #4a4a4a;
+  --text-secondary: #7a6e6f;
+  --text-tertiary: #a9a09f;
+  --text-inverse: #ffffff;
+
+  --accent-primary: #ff8fb0;
+  --accent-hover: #ff709a;
+  --accent-subtle: rgba(255, 143, 176, 0.15);
+
+  --border-color: rgba(255, 143, 176, 0.2);
+  --border-subtle: rgba(255, 143, 176, 0.08);
+}
+
+[data-theme="macaron"][data-mode="dark"] {
+  --bg-primary: #2d1b2e;
+  --bg-secondary: #3a2536;
+  --bg-tertiary: #4a3043;
+  --bg-editor: #2d1b2e;
+
+  --text-primary: #fcdce6;
+  --text-secondary: #dbb6c3;
+  --text-tertiary: #b08d9c;
+  --text-inverse: #2d1b2e;
+
+  --accent-primary: #ff8fb0;
+  --accent-hover: #ffaacc;
+  --accent-subtle: rgba(255, 143, 176, 0.2);
+
+  --border-color: rgba(255, 143, 176, 0.2);
+  --border-subtle: rgba(255, 143, 176, 0.08);
+}
+
+/* =========================================================
+   撞色 & 炫光主题
+   ========================================================= */
+
+/* 🦿 赛博朋克 (Cyberpunk)
+   黄蓝紫极高对比度，刺眼的霓虹感 */
+[data-theme="cyberpunk"] {
+  --bg-primary: #fcee0a; /* 赛博黄 */
+  --bg-secondary: #ebd900;
+  --bg-tertiary: #d4c400;
+  --bg-editor: #fcee0a;
+  
+  --text-primary: #000000;
+  --text-secondary: #1a1a1a;
+  --text-tertiary: #333333;
+  
+  --accent-primary: #00f0ff; /* 赛博蓝 */
+  --accent-hover: #00d0e0;
+  --accent-subtle: rgba(0, 240, 255, 0.2);
+  
+  --border-color: #ff003c; /* 赛博红 */
+  --border-subtle: rgba(255, 0, 60, 0.3);
+  
+  --shadow-sm: 4px 4px 0px rgba(255, 0, 60, 1);
+  --shadow-md: 6px 6px 0px rgba(255, 0, 60, 1);
+  --shadow-lg: 8px 8px 0px rgba(255, 0, 60, 1);
+  --radius-sm: 0px; /* 赛博朋克不用圆角 */
+  --radius-md: 0px;
+  --radius-lg: 0px;
+}
+
+[data-theme="cyberpunk"][data-mode="dark"] {
+  --bg-primary: #080808;
+  --bg-secondary: #121212;
+  --bg-tertiary: #1c1c1c;
+  --bg-editor: #000000;
+  
+  --text-primary: #00f0ff;
+  --text-secondary: #e2e2e2;
+  --text-tertiary: #a0a0a0;
+  
+  --accent-primary: #ff003c; 
+  --accent-hover: #fcee0a;
+  --accent-subtle: rgba(255, 0, 60, 0.15);
+  
+  --border-color: #00f0ff;
+  --border-subtle: rgba(0, 240, 255, 0.3);
+  
+  --shadow-sm: 4px 4px 0px rgba(0, 240, 255, 0.8);
+  --shadow-md: 6px 6px 0px rgba(0, 240, 255, 0.8);
+  --shadow-lg: 8px 8px 0px rgba(255, 0, 60, 0.8);
+}
+
+/* 📼 迈阿密复古 (Retro / Synthwave)
+   粉紫渐变和冷蓝的撞色，复古 80 年代风 */
+[data-theme="retro"] {
+  --bg-primary: #fff2f9; 
+  --bg-secondary: #ffe1f0;
+  --bg-tertiary: #ffcce5;
+  --bg-editor: #ffffff;
+  
+  --text-primary: #3d1059;
+  --text-secondary: #5e1c8a;
+  --text-tertiary: #8432bd;
+  
+  --accent-primary: #ff1493; /* 深粉色 */
+  --accent-hover: #d1007a;
+  --accent-subtle: rgba(255, 20, 147, 0.15);
+  
+  --border-color: rgba(255, 20, 147, 0.3);
+  --border-subtle: rgba(255, 20, 147, 0.15);
+  
+  --shadow-sm: 0 4px 10px rgba(255, 20, 147, 0.1);
+}
+
+[data-theme="retro"][data-mode="dark"] {
+  --bg-primary: #120429; /* 深夜紫 */
+  --bg-secondary: #1e0940;
+  --bg-tertiary: #2a0e59;
+  --bg-editor: #0c021c;
+  
+  --text-primary: #00ffff; /* 复古青 */
+  --text-secondary: #ff71ce; /* 复古粉 */
+  --text-tertiary: #b0a0e0;
+  
+  --accent-primary: #ff71ce;
+  --accent-hover: #00ffff;
+  --accent-subtle: rgba(255, 113, 206, 0.2);
+  
+  --border-color: #00ffff;
+  --border-subtle: rgba(0, 255, 255, 0.2);
+  
+  --shadow-sm: 0 4px 12px rgba(0, 255, 255, 0.2), 0 0 8px rgba(255, 113, 206, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 255, 255, 0.2), 0 0 16px rgba(255, 113, 206, 0.3);
+}
+
+/* ⚡ 霓虹青紫 (Neon)
+   主打暗色调下的刺眼高亮 */
+[data-theme="neon"] {
+  --bg-primary: #e6fffb; /* 极浅青 */
+  --bg-secondary: #b5f5ec;
+  --bg-tertiary: #87e8de;
+  --bg-editor: #ffffff;
+  
+  --text-primary: #002329;
+  --text-secondary: #00474f;
+  --text-tertiary: #006d75;
+  
+  --accent-primary: #722ed1; /* 霓虹亮紫 */
+  --accent-hover: #531dab;
+  --accent-subtle: rgba(114, 46, 209, 0.15);
+  
+  --border-color: rgba(114, 46, 209, 0.2);
+  --border-subtle: rgba(114, 46, 209, 0.1);
+}
+
+[data-theme="neon"][data-mode="dark"] {
+  --bg-primary: #0b0217; /* 极深紫 */
+  --bg-secondary: #130628;
+  --bg-tertiary: #1b0a3b;
+  --bg-editor: #070110;
+  
+  --text-primary: #00f0ff;
+  --text-secondary: #b37feb;
+  --text-tertiary: #7546c9;
+  
+  --accent-primary: #00e676; /* 霓虹绿 */
+  --accent-hover: #00f0ff;
+  --accent-subtle: rgba(0, 230, 118, 0.2);
+  
+  --border-color: rgba(0, 240, 255, 0.3);
+  --border-subtle: rgba(0, 240, 255, 0.1);
+  
+  --shadow-md: 0 0 10px rgba(0, 240, 255, 0.4), 0 0 20px rgba(0, 230, 118, 0.2);
 }
