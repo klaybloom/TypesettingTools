@@ -2,8 +2,10 @@
   <div class="preview-wrapper" :class="mode">
     <div class="preview-device" v-if="mode === 'mobile'">
       <div class="device-frame">
-        <div class="device-notch"></div>
         <div class="device-screen">
+          <div class="device-statusbar">
+            <div class="device-notch"></div>
+          </div>
           <div class="wechat-header">
             <svg viewBox="0 0 24 24" width="18" height="18" class="back-icon">
               <path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
@@ -16,6 +18,7 @@
           <div 
             ref="previewContentRef"
             class="preview-content wechat-style"
+            @scroll="handleScroll"
             v-html="content || emptyState"
           ></div>
         </div>
@@ -26,6 +29,7 @@
       <div 
         ref="previewContentRef"
         class="preview-content wechat-style"
+        @scroll="handleScroll"
         v-html="content || emptyState"
       ></div>
     </div>
@@ -33,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = defineProps({
   content: {
@@ -51,17 +55,32 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['scroll'])
 const previewContentRef = ref(null)
+const syncingFromExternal = ref(false)
 
-// Sync scroll from editor
-watch(() => props.scrollRatio, (ratio) => {
+// Sync scroll from editor (re-apply when mode switches)
+watch(() => [props.scrollRatio, props.mode], ([ratio]) => {
   const el = previewContentRef.value
   if (!el) return
   const maxScroll = el.scrollHeight - el.clientHeight
-  if (maxScroll > 0) {
-    el.scrollTop = ratio * maxScroll
-  }
-})
+  if (maxScroll <= 0) return
+  const target = ratio * maxScroll
+  if (Math.abs(el.scrollTop - target) < 1) return
+  syncingFromExternal.value = true
+  el.scrollTop = target
+  requestAnimationFrame(() => {
+    syncingFromExternal.value = false
+  })
+}, { immediate: true })
+
+function handleScroll(e) {
+  if (syncingFromExternal.value) return
+  const el = e.target
+  const maxScroll = el.scrollHeight - el.clientHeight
+  const ratio = maxScroll > 0 ? el.scrollTop / maxScroll : 0
+  emit('scroll', ratio)
+}
 
 // Expose ref for parent (e.g., export image)
 defineExpose({ previewContentRef })
@@ -82,62 +101,91 @@ const emptyState = computed(() => `
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: var(--spacing-lg);
+  padding: 10px;
   background: var(--bg-secondary);
-  overflow-y: auto;
+  overflow: hidden;
+}
+
+.preview-device {
+  display: flex;
+  justify-content: center;
 }
 
 /* 手机模拟器 */
 .device-frame {
-  width: 380px;
-  background: #000;
-  border-radius: 46px;
-  padding: 10px;
-  box-shadow: 
-    0 0 0 1px #333,
-    0 10px 20px rgba(0,0,0,0.1),
-    0 30px 60px rgba(0,0,0,0.15),
-    inset 0 0 4px rgba(255,255,255,0.2);
+  width: 332px;
+  height: 676px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 42px;
+  background: linear-gradient(180deg, #1b1c20 0%, #060607 100%);
+  box-shadow:
+    0 16px 40px rgba(46, 52, 66, 0.16),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.device-frame::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 41px;
+  border: 1px solid rgba(255,255,255,0.05);
+  pointer-events: none;
 }
 
 .device-notch {
-  width: 150px;
-  height: 28px;
-  background: #000;
-  border-radius: 0 0 20px 20px;
-  margin: 0 auto 8px;
+  width: 110px;
+  height: 25px;
+  margin: 6px auto 0;
   position: relative;
+  background: #050505;
+  border-radius: 999px;
 }
 
 .device-notch::after {
   content: '';
   position: absolute;
   top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50px;
-  height: 6px;
-  background: #1a1a1a;
-  border-radius: 3px;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+  right: 15px;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle at 35% 35%, #454545 0%, #1a1a1a 55%, #090909 100%);
+  border-radius: 50%;
+}
+
+.device-notch::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 18px;
+  width: 54px;
+  height: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 999px;
 }
 
 .device-screen {
-  background: #fff;
+  position: absolute;
+  inset: 7px 7px 8px;
+  background: #ffffff;
   border-radius: 36px;
   overflow: hidden;
-  height: 620px;
   display: flex;
   flex-direction: column;
-  box-shadow: inset 0 0 2px rgba(0,0,0,0.2);
+}
+
+.device-statusbar {
+  flex-shrink: 0;
+  height: 34px;
+  background: #f2f2f4;
 }
 
 .wechat-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  background: #ededed;
+  padding: 10px 16px 12px;
+  background: #f2f2f4;
   font-size: 16px;
   font-weight: 500;
   color: #000;
@@ -172,11 +220,14 @@ const emptyState = computed(() => `
 /* 桌面端预览 */
 .preview-desktop {
   width: 100%;
+  height: 100%;
   max-width: 680px;
+  display: flex;
+  overflow: hidden;
   background: var(--bg-primary);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
 }
 
 /* 微信公众号样式 */

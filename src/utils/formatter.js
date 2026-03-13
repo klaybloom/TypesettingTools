@@ -69,8 +69,8 @@ function getStyles(settings) {
         ul: `margin: 16px 0; padding-left: 24px;`,
         ol: `margin: 16px 0; padding-left: 24px;`,
         li: `margin-bottom: 4px; color: ${settings.textColor};`,
-        // 列表项内的段落（去掉额外 margin）
-        liParagraph: `margin: 0; text-align: justify;${settings.textIndent ? ' text-indent: 2em;' : ''}`,
+        // 列表项内的段落（去掉额外 margin，且不应用首行缩进）
+        liParagraph: `margin: 0; text-align: justify; text-indent: 0;`,
         // 粗体
         strong: `color: ${settings.accentColor}; font-weight: 700;`,
         // 斜体

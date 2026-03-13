@@ -83,12 +83,10 @@
     <main class="app-main">
       <!-- 左侧编辑器 -->
       <section class="editor-section">
-        <div class="section-header">
-          <span class="section-title">输入</span>
-          <span class="char-count">{{ charCount }}字</span>
-        </div>
         <Editor 
           v-model="rawContent" 
+          :char-count="charCount"
+          :scroll-ratio="scrollRatio"
           placeholder="粘贴文章内容，支持 Markdown..."
           @scroll="onEditorScroll"
         />
@@ -116,6 +114,7 @@
           :content="formattedContent" 
           :mode="previewMode"
           :scrollRatio="scrollRatio"
+          @scroll="onPreviewScroll"
         />
       </section>
     </main>
@@ -266,6 +265,10 @@ function showToast(message, type = 'success') {
 
 // 编辑器滚动同步
 function onEditorScroll(ratio) {
+  scrollRatio.value = ratio
+}
+
+function onPreviewScroll(ratio) {
   scrollRatio.value = ratio
 }
 
@@ -499,8 +502,8 @@ onUnmounted(() => {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  padding: 24px;
+  gap: 10px;
+  padding: 5px;
   background: var(--bg-secondary);
   overflow: hidden;
 }

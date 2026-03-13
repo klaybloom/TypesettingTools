@@ -204,7 +204,7 @@ function resetSettings() {
   right: 0;
   top: 0;
   bottom: 0;
-  width: 320px;
+  width: 304px;
   background: var(--bg-primary);
   border-left: 1px solid var(--border-color);
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
@@ -213,45 +213,45 @@ function resetSettings() {
 }
 
 .panel-header {
-  padding: 12px 16px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .panel-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .panel-content {
   flex: 1;
-  padding: 16px;
+  padding: 12px;
   overflow-y: auto;
 }
 
 .setting-group {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 12px;
 }
 
 .setting-group label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: var(--spacing-sm);
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
 }
 
 .setting-control {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 8px;
 }
 
 .setting-control input[type="range"] {
   flex: 1;
-  height: 4px;
+  height: 3px;
   background: var(--bg-tertiary);
   border-radius: 2px;
   appearance: none;
@@ -260,8 +260,8 @@ function resetSettings() {
 
 .setting-control input[type="range"]::-webkit-slider-thumb {
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   background: var(--accent-primary);
   border-radius: 50%;
   cursor: pointer;
@@ -273,8 +273,8 @@ function resetSettings() {
 }
 
 .setting-value {
-  min-width: 50px;
-  font-size: 0.875rem;
+  min-width: 44px;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -282,12 +282,12 @@ function resetSettings() {
 
 .color-options {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 6px;
 }
 
 .color-btn {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: var(--color);
   border: 3px solid transparent;
@@ -306,7 +306,7 @@ function resetSettings() {
 
 .reset-btn {
   width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 7px 10px;
   background: var(--bg-tertiary);
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
@@ -321,17 +321,17 @@ function resetSettings() {
 /* 主题预设卡片 */
 .preset-cards {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding-bottom: 2px;
 }
 
 .preset-card {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 8px;
+  gap: 5px;
+  padding: 5px 8px;
+  border-radius: 7px;
   background: var(--bg-tertiary);
   border: 2px solid transparent;
   cursor: pointer;
@@ -350,15 +350,15 @@ function resetSettings() {
 }
 
 .preset-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--preset-color);
   flex-shrink: 0;
 }
 
 .preset-name {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-secondary);
 }

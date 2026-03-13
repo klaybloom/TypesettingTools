@@ -1,7 +1,8 @@
 <template>
   <div class="editor-wrapper">
-    <!-- Markdown 工具栏 -->
-    <div class="markdown-toolbar">
+    <div class="editor-topbar">
+      <!-- Markdown 工具栏 -->
+      <div class="markdown-toolbar">
       <!-- 标题下拉 -->
       <div class="toolbar-dropdown">
         <button class="toolbar-btn with-arrow" @click="toggleHeadingMenu" title="标题">
@@ -102,6 +103,8 @@
         style="display: none"
         @change="handleImageUpload"
       />
+      </div>
+      <span class="char-count">{{ charCount }}字</span>
     </div>
     
     <!-- 编辑器 -->
@@ -119,18 +122,16 @@
         spellcheck="false"
       ></textarea>
     </div>
-    
-    <div class="editor-footer">
-      <span class="editor-hint">⌘B 粗体 | ⌘I 斜体 | ⌘⇧X 删除线 | ⌘⇧K 代码块 | ⌘⇧Q 引用 | ⌘L 链接 | 支持粘贴图片</span>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
+  charCount: { type: Number, default: 0 },
+  scrollRatio: { type: Number, default: 0 },
   placeholder: { type: String, default: '在此输入内容...' }
 })
 
@@ -139,6 +140,7 @@ const textareaRef = ref(null)
 const imageInputRef = ref(null)
 const showHeadingMenu = ref(false)
 const showTodoMenu = ref(false)
+const syncingFromExternal = ref(false)
 
 function toggleHeadingMenu() {
   showHeadingMenu.value = !showHeadingMenu.value
@@ -160,12 +162,27 @@ function handleInput(e) {
 }
 
 function handleScroll() {
+  if (syncingFromExternal.value) return
   const ta = textareaRef.value
   if (!ta) return
   const maxScroll = ta.scrollHeight - ta.clientHeight
   const ratio = maxScroll > 0 ? ta.scrollTop / maxScroll : 0
   emit('scroll', ratio)
 }
+
+watch(() => props.scrollRatio, (ratio) => {
+  const ta = textareaRef.value
+  if (!ta) return
+  const maxScroll = ta.scrollHeight - ta.clientHeight
+  if (maxScroll <= 0) return
+  const target = ratio * maxScroll
+  if (Math.abs(ta.scrollTop - target) < 1) return
+  syncingFromExternal.value = true
+  ta.scrollTop = target
+  requestAnimationFrame(() => {
+    syncingFromExternal.value = false
+  })
+})
 
 function handleKeydown(e) {
   const mod = e.ctrlKey || e.metaKey
@@ -317,28 +334,61 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   overflow: hidden;
 }
 
+.editor-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-primary);
+}
+
+.section-title {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+
+.char-count {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
 .markdown-toolbar {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-subtle);
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  height: 24px;
+  background: transparent;
+  border-bottom: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.markdown-toolbar::-webkit-scrollbar {
+  display: none;
 }
 
 .toolbar-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
+  padding: 4px;
   border-radius: 4px;
   color: var(--text-secondary);
   background: transparent;
   border: none;
   cursor: pointer;
   transition: all var(--transition-fast);
-  min-width: 28px;
-  height: 28px;
+  min-width: 22px;
+  height: 22px;
 }
 
 .toolbar-btn:hover {
@@ -357,7 +407,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 .toolbar-btn.with-arrow {
   gap: 2px;
-  padding: 5px 6px;
+  padding: 4px 5px;
 }
 
 .arrow-icon {
@@ -365,7 +415,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 }
 
 .btn-text {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -376,9 +426,9 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 .toolbar-divider {
   width: 1px;
-  height: 18px;
+  height: 14px;
   background: var(--border-color);
-  margin: 0 4px;
+  margin: 0 2px;
 }
 
 /* 下拉菜单 */
@@ -480,7 +530,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 .editor-footer {
   padding: 4px 12px;
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border-top: 1px solid var(--border-subtle);
 }
 
