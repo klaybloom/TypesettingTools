@@ -127,6 +127,7 @@
 
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { useHistory } from '../composables/useHistory.js'
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
@@ -141,6 +142,17 @@ const imageInputRef = ref(null)
 const showHeadingMenu = ref(false)
 const showTodoMenu = ref(false)
 const syncingFromExternal = ref(false)
+
+// 历史记录管理
+const { pushHistory, undo, redo, canUndo, canRedo } = useHistory(props.modelValue, {
+  maxHistory: 100,
+  debounceTime: 500
+})
+
+// 监听外部内容变化，推入历史记录
+watch(() => props.modelValue, (newVal) => {
+  pushHistory(newVal)
+})
 
 function toggleHeadingMenu() {
   showHeadingMenu.value = !showHeadingMenu.value
@@ -186,6 +198,25 @@ watch(() => props.scrollRatio, (ratio) => {
 
 function handleKeydown(e) {
   const mod = e.ctrlKey || e.metaKey
+
+  // 撤销/重做
+  if (mod && !e.shiftKey && e.key === 'z') {
+    e.preventDefault()
+    const prevValue = undo()
+    if (prevValue !== null) {
+      emit('update:modelValue', prevValue)
+    }
+    return
+  }
+  if (mod && (e.shiftKey && e.key === 'z' || e.key === 'y')) {
+    e.preventDefault()
+    const nextValue = redo()
+    if (nextValue !== null) {
+      emit('update:modelValue', nextValue)
+    }
+    return
+  }
+
   if (e.key === 'Tab') {
     e.preventDefault()
     insertAtCursor('    ')
@@ -225,7 +256,10 @@ function handlePaste(e) {
     if (item.type.startsWith('image/')) {
       e.preventDefault()
       const file = item.getAsFile()
-      if (file) convertImageToBase64AndInsert(file)
+      if (file) {
+        if (!validateImageSize(file)) return
+        convertImageToBase64AndInsert(file)
+      }
       return
     }
   }
@@ -239,10 +273,24 @@ function triggerImageUpload() {
 function handleImageUpload(e) {
   const file = e.target.files?.[0]
   if (file && file.type.startsWith('image/')) {
+    if (!validateImageSize(file)) {
+      e.target.value = ''
+      return
+    }
     convertImageToBase64AndInsert(file)
   }
   // 重置 input 以允许重复选择同一文件
   e.target.value = ''
+}
+
+// 验证图片大小（最大 5MB）
+function validateImageSize(file) {
+  const maxSize = 5 * 1024 * 1024 // 5MB
+  if (file.size > maxSize) {
+    alert(`图片大小不能超过 5MB\n当前图片大小：${(file.size / 1024 / 1024).toFixed(2)}MB`)
+    return false
+  }
+  return true
 }
 
 // 将图片转为 base64 并插入 Markdown 图片语法
@@ -253,6 +301,9 @@ function convertImageToBase64AndInsert(file) {
     const fileName = file.name || '图片'
     const markdownImg = `\n![${fileName}](${base64})\n`
     insertAtCursor(markdownImg)
+  }
+  reader.onerror = () => {
+    alert('图片读取失败，请重试')
   }
   reader.readAsDataURL(file)
 }

@@ -10,8 +10,8 @@
       </div>
       
       <div class="header-actions">
-        <button 
-          class="action-btn" 
+        <button
+          class="action-btn"
           @click.stop="showStylePanel = !showStylePanel"
           :class="{ active: showStylePanel }"
         >
@@ -21,8 +21,8 @@
           样式
         </button>
 
-        <button 
-          class="action-btn primary" 
+        <button
+          class="action-btn primary"
           @click="copyHtml"
           :disabled="!formattedContent"
         >
@@ -32,16 +32,26 @@
           {{ copySuccess ? '已复制' : '复制' }}
         </button>
 
-        <button 
-          class="action-btn" 
+        <button
+          class="action-btn"
           @click="exportImage"
-          :disabled="!formattedContent"
+          :disabled="!formattedContent || isExporting"
         >
-          <svg viewBox="0 0 24 24" width="16" height="16">
+          <svg v-if="!isExporting" viewBox="0 0 24 24" width="16" height="16">
             <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
           </svg>
-          导出图片
+          <svg v-else viewBox="0 0 24 24" width="16" height="16" class="spinning">
+            <path fill="currentColor" d="M12 4V2A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8Z"/>
+          </svg>
+          {{ isExporting ? '导出中...' : '导出图片' }}
         </button>
+
+        <div class="stats-display">
+          <span class="stat-item">{{ charCount }} 字</span>
+          <span class="stat-divider">·</span>
+          <span class="stat-item">{{ readingTime }} 分钟</span>
+        </div>
+
         <div class="theme-dropdown" @click.stop>
           <button class="icon-btn" @click="toggleThemeMenu" :title="'当前风格: ' + themeName">
             <svg viewBox="0 0 24 24" width="18" height="18">
@@ -149,6 +159,8 @@ const colorMode = ref('light')
 
 // 内容状态
 const rawContent = ref('')
+const debouncedContent = ref('')
+const debouncedSettings = ref({ ...defaultSettings })
 
 // UI 状态
 const previewMode = ref('mobile')
@@ -162,14 +174,42 @@ const previewRef = ref(null)
 // 样式设置（从统一配置加载）
 const styleSettings = ref({ ...defaultSettings })
 
-// 计算属性 - 自动排版：内容或样式变化时自动更新
+// 防抖定时器
+let contentDebounceTimer = null
+let settingsDebounceTimer = null
+
+// 防抖处理：内容变化
+watch(rawContent, (newVal) => {
+  clearTimeout(contentDebounceTimer)
+  contentDebounceTimer = setTimeout(() => {
+    debouncedContent.value = newVal
+  }, 300)
+}, { immediate: true })
+
+// 防抖处理：样式变化
+watch(styleSettings, (newVal) => {
+  clearTimeout(settingsDebounceTimer)
+  settingsDebounceTimer = setTimeout(() => {
+    debouncedSettings.value = { ...newVal }
+  }, 150)
+}, { deep: true, immediate: true })
+
+// 计算属性 - 自动排版：使用防抖后的内容和样式
 const formattedContent = computed(() => {
-  if (!rawContent.value.trim()) return ''
-  return inlineStyles(formatText(rawContent.value, styleSettings.value))
+  if (!debouncedContent.value.trim()) return ''
+  return inlineStyles(formatText(debouncedContent.value, debouncedSettings.value))
 })
 
 const hasContent = computed(() => rawContent.value.trim().length > 0)
 const charCount = computed(() => rawContent.value.replace(/\s/g, '').length)
+
+// 预计阅读时间（分钟）- 基于中文平均阅读速度 300-500 字/分钟
+const readingTime = computed(() => {
+  const chars = charCount.value
+  if (chars === 0) return 0
+  const minutes = Math.ceil(chars / 400) // 使用 400 字/分钟作为平均速度
+  return minutes
+})
 
 const themeName = computed(() => {
   const map = {
@@ -273,14 +313,24 @@ function onPreviewScroll(ratio) {
 }
 
 // 导出图片（长截图）
+const isExporting = ref(false)
+
 async function exportImage() {
   const previewEl = previewRef.value?.previewContentRef
   if (!previewEl) {
     showToast('导出失败：无法获取预览区域', 'error')
     return
   }
+
+  if (isExporting.value) {
+    showToast('正在导出中，请稍候...', 'error')
+    return
+  }
+
+  isExporting.value = true
+
   try {
-    showToast('正在生成长截图...', 'success')
+    showToast('正在生成长截图，请稍候...', 'success')
 
     // 收集需要临时展开的滚动容器
     const scrollAncestors = []
@@ -325,9 +375,20 @@ async function exportImage() {
     link.download = `typesetting-${Date.now()}.png`
     link.href = canvas.toDataURL('image/png')
     link.click()
-    showToast('图片已导出', 'success')
+    showToast('图片已导出成功', 'success')
   } catch (err) {
-    showToast('导出失败：' + err.message, 'error')
+    console.error('导出图片失败：', err)
+    let errorMsg = '导出失败'
+    if (err.message.includes('canvas')) {
+      errorMsg = '导出失败：Canvas 渲染错误，请尝试缩小内容'
+    } else if (err.message.includes('memory')) {
+      errorMsg = '导出失败：内存不足，请尝试缩小内容或降低图片质量'
+    } else if (err.message) {
+      errorMsg = `导出失败：${err.message}`
+    }
+    showToast(errorMsg, 'error')
+  } finally {
+    isExporting.value = false
   }
 }
 
@@ -430,6 +491,26 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* 统计信息显示 */
+.stats-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+}
+
+.stat-item {
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-divider {
+  opacity: 0.5;
 }
 
 /* 按钮样式 - 黑白灰配色 */
@@ -662,6 +743,16 @@ onUnmounted(() => {
 .pop-leave-to {
   opacity: 0;
   transform: scale(0.95);
+}
+
+/* 加载动画 */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
 }
 
 @media (max-width: 1024px) {
