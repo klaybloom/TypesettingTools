@@ -63,16 +63,16 @@
               
               <div class="menu-group-title">主题风格</div>
               <button @click="changeTheme('default')" :class="{ active: theme === 'default' }"><span class="menu-icon">🎨</span> 默认配色</button>
-              <button @click="changeTheme('notion')" :class="{ active: theme === 'notion' }"><span class="menu-icon">📝</span> 象牙暖 (Notion)</button>
-              <button @click="changeTheme('vercel')" :class="{ active: theme === 'vercel' }"><span class="menu-icon">⬛</span> 极简灰 (Vercel)</button>
-              <button @click="changeTheme('linear')" :class="{ active: theme === 'linear' }"><span class="menu-icon">🌌</span> 极光紫 (Linear)</button>
-              <button @click="changeTheme('macaron')" :class="{ active: theme === 'macaron' }"><span class="menu-icon">🍬</span> 马卡龙 (Macaron)</button>
+              <button @click="changeTheme('notion')" :class="{ active: theme === 'notion' }"><span class="menu-icon">📝</span> 象牙暖</button>
+              <button @click="changeTheme('vercel')" :class="{ active: theme === 'vercel' }"><span class="menu-icon">⬛</span> 极简灰</button>
+              <button @click="changeTheme('linear')" :class="{ active: theme === 'linear' }"><span class="menu-icon">🌌</span> 极光紫</button>
+              <button @click="changeTheme('macaron')" :class="{ active: theme === 'macaron' }"><span class="menu-icon">🍬</span> 马卡龙</button>
               <div class="menu-divider"></div>
               
               <div class="menu-group-title">撞色 & 炫光</div>
-              <button @click="changeTheme('cyberpunk')" :class="{ active: theme === 'cyberpunk' }"><span class="menu-icon">🦿</span> 赛博朋克 (Cyberpunk)</button>
-              <button @click="changeTheme('retro')" :class="{ active: theme === 'retro' }"><span class="menu-icon">📼</span> 迈阿密复古 (Retro)</button>
-              <button @click="changeTheme('neon')" :class="{ active: theme === 'neon' }"><span class="menu-icon">⚡</span> 霓虹青紫 (Neon)</button>
+              <button @click="changeTheme('cyberpunk')" :class="{ active: theme === 'cyberpunk' }"><span class="menu-icon">🦿</span> 赛博朋克</button>
+              <button @click="changeTheme('retro')" :class="{ active: theme === 'retro' }"><span class="menu-icon">📼</span> 迈阿密复古</button>
+              <button @click="changeTheme('neon')" :class="{ active: theme === 'neon' }"><span class="menu-icon">⚡</span> 霓虹青紫</button>
             </div>
           </Transition>
         </div>
@@ -608,9 +608,9 @@ onUnmounted(() => {
 .theme-dropdown .dropdown-menu button {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  padding: 8px 12px;
+  padding: 6px 10px;
   text-align: left;
   font-size: 13px;
   color: var(--text-primary);
@@ -640,16 +640,14 @@ onUnmounted(() => {
 .menu-group-title {
   font-size: 11px;
   color: var(--text-tertiary);
-  padding: 4px 12px;
-  margin-top: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  margin-top: 1px;
 }
 
 .menu-divider {
   height: 1px;
   background: var(--border-color);
-  margin: 4px 0;
+  margin: 2px 0;
 }
 
 .pop-enter-active,
