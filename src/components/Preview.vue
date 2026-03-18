@@ -82,9 +82,6 @@ function handleScroll(e) {
   emit('scroll', ratio)
 }
 
-// Expose ref for parent (e.g., export image)
-defineExpose({ previewContentRef })
-
 const emptyState = computed(() => `
   <div class="empty-preview">
     <svg viewBox="0 0 24 24" width="48" height="48">

@@ -120,7 +120,6 @@
           </div>
         </div>
         <Preview 
-          ref="previewRef"
           :content="formattedContent" 
           :mode="previewMode"
           :scrollRatio="scrollRatio"
@@ -136,6 +135,8 @@
       @toggle="showStylePanel = !showStylePanel"
     />
 
+    <ExportSurface ref="exportSurfaceRef" :content="formattedContent" />
+
     <!-- Toast 提示 -->
     <Transition name="toast">
       <div v-if="toast.show" class="toast" :class="toast.type">
@@ -148,10 +149,13 @@
 <script setup>
 import { ref } from 'vue'
 import Editor from './components/Editor.vue'
+import ExportSurface from './components/ExportSurface.vue'
 import Preview from './components/Preview.vue'
 import StylePanel from './components/StylePanel.vue'
 import { defaultArticleStyleSettings } from './utils/config.js'
 import { useAppearance } from './composables/useAppearance.js'
+import { useClipboardHtml } from './composables/useClipboardHtml.js'
+import { useImageExport } from './composables/useImageExport.js'
 import { usePersistentStyleSettings } from './composables/usePersistentStyleSettings.js'
 import { useRenderedDocument } from './composables/useRenderedDocument.js'
 import { useToast } from './composables/useToast.js'
@@ -161,59 +165,27 @@ const previewMode = ref('mobile')
 const showStylePanel = ref(false)
 const copySuccess = ref(false)
 const scrollRatio = ref(0)
-const previewRef = ref(null)
+const exportSurfaceRef = ref(null)
 
 const { theme, colorMode, showThemeMenu, themeName, setColorMode, toggleThemeMenu, changeTheme } = useAppearance()
+const { copyHtmlToClipboard } = useClipboardHtml()
+const { isExporting, exportElementAsImage } = useImageExport()
 const { toast, showToast } = useToast()
 const { articleStyleSettings } = usePersistentStyleSettings(defaultArticleStyleSettings)
+
 const { rawContent, formattedContent, charCount, readingTime } = useRenderedDocument(articleStyleSettings)
 
 async function copyHtml() {
-  if (!formattedContent.value) return
-  
-  try {
-    // 使用 ClipboardItem API 复制富文本，保留格式
-    const htmlBlob = new Blob([formattedContent.value], { type: 'text/html' })
-    const textBlob = new Blob([formattedContent.value], { type: 'text/plain' })
-    
-    const clipboardItem = new ClipboardItem({
-      'text/html': htmlBlob,
-      'text/plain': textBlob
-    })
-    
-    await navigator.clipboard.write([clipboardItem])
+  const copied = await copyHtmlToClipboard(formattedContent.value)
+
+  if (copied) {
     copySuccess.value = true
     showToast('已复制！可直接粘贴到公众号', 'success')
     setTimeout(() => copySuccess.value = false, 2000)
-  } catch (err) {
-    // 降级方案：如果 ClipboardItem 不支持，使用传统方式
-    try {
-      // 创建一个临时的富文本容器
-      const tempDiv = document.createElement('div')
-      tempDiv.innerHTML = formattedContent.value
-      tempDiv.style.position = 'absolute'
-      tempDiv.style.left = '-9999px'
-      document.body.appendChild(tempDiv)
-      
-      // 选中并复制
-      const range = document.createRange()
-      range.selectNodeContents(tempDiv)
-      const selection = window.getSelection()
-      selection.removeAllRanges()
-      selection.addRange(range)
-      
-      document.execCommand('copy')
-      
-      selection.removeAllRanges()
-      document.body.removeChild(tempDiv)
-      
-      copySuccess.value = true
-      showToast('已复制！可直接粘贴到公众号', 'success')
-      setTimeout(() => copySuccess.value = false, 2000)
-    } catch (fallbackErr) {
-      showToast('复制失败，请手动复制', 'error')
-    }
+    return
   }
+
+  showToast('复制失败，请手动复制', 'error')
 }
 
 // （已移除点击空白处关闭样式面板逻辑，改为常驻推挤排版）
@@ -227,84 +199,16 @@ function onPreviewScroll(ratio) {
   scrollRatio.value = ratio
 }
 
-// 导出图片（长截图）
-const isExporting = ref(false)
-
 async function exportImage() {
-  const previewEl = previewRef.value?.previewContentRef
-  if (!previewEl) {
-    showToast('导出失败：无法获取预览区域', 'error')
+  const exportEl = exportSurfaceRef.value?.exportContentRef
+  if (!exportEl) {
+    showToast('导出失败：无法获取导出区域', 'error')
     return
   }
 
-  if (isExporting.value) {
-    showToast('正在导出中，请稍候...', 'error')
-    return
-  }
-
-  isExporting.value = true
-
-  try {
-    showToast('正在生成长截图，请稍候...', 'success')
-
-    // 收集需要临时展开的滚动容器
-    const scrollAncestors = []
-    let el = previewEl
-    while (el) {
-      const style = window.getComputedStyle(el)
-      const ov = style.overflow + style.overflowY
-      if (/auto|scroll|hidden/.test(ov)) {
-        scrollAncestors.push({
-          el,
-          overflow: el.style.overflow,
-          overflowY: el.style.overflowY,
-          height: el.style.height,
-          maxHeight: el.style.maxHeight,
-        })
-        el.style.overflow = 'visible'
-        el.style.overflowY = 'visible'
-        el.style.height = 'auto'
-        el.style.maxHeight = 'none'
-      }
-      el = el.parentElement
-    }
-
-    const html2canvas = (await import('html2canvas')).default
-    const canvas = await html2canvas(previewEl, {
-      backgroundColor: '#ffffff',
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      windowHeight: previewEl.scrollHeight,
-    })
-
-    // 恢复所有容器原始样式
-    scrollAncestors.forEach(({ el, overflow, overflowY, height, maxHeight }) => {
-      el.style.overflow = overflow
-      el.style.overflowY = overflowY
-      el.style.height = height
-      el.style.maxHeight = maxHeight
-    })
-
-    const link = document.createElement('a')
-    link.download = `typesetting-${Date.now()}.png`
-    link.href = canvas.toDataURL('image/png')
-    link.click()
-    showToast('图片已导出成功', 'success')
-  } catch (err) {
-    console.error('导出图片失败：', err)
-    let errorMsg = '导出失败'
-    if (err.message.includes('canvas')) {
-      errorMsg = '导出失败：Canvas 渲染错误，请尝试缩小内容'
-    } else if (err.message.includes('memory')) {
-      errorMsg = '导出失败：内存不足，请尝试缩小内容或降低图片质量'
-    } else if (err.message) {
-      errorMsg = `导出失败：${err.message}`
-    }
-    showToast(errorMsg, 'error')
-  } finally {
-    isExporting.value = false
-  }
+  showToast('正在生成长截图，请稍候...', 'success')
+  const result = await exportElementAsImage(exportEl)
+  showToast(result.message, result.ok ? 'success' : 'error')
 }
 
 </script>
