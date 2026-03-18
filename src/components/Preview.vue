@@ -17,7 +17,7 @@
           </div>
           <div 
             ref="previewContentRef"
-            class="preview-content wechat-style"
+            class="preview-content"
             @scroll="handleScroll"
             v-html="content || emptyState"
           ></div>
@@ -28,7 +28,7 @@
     <div v-else class="preview-desktop">
       <div 
         ref="previewContentRef"
-        class="preview-content wechat-style"
+        class="preview-content"
         @scroll="handleScroll"
         v-html="content || emptyState"
       ></div>
@@ -228,54 +228,6 @@ const emptyState = computed(() => `
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   padding: var(--spacing-lg);
-}
-
-/* 微信公众号样式 */
-.wechat-style :deep(h1) {
-  font-size: 22px;
-  font-weight: 700;
-  color: #3f3f3f;
-  margin-bottom: 24px;
-  line-height: 1.4;
-}
-
-.wechat-style :deep(h2) {
-  font-size: 18px;
-  font-weight: 600;
-  color: #262626;
-  margin: 20px 0 12px;
-  padding-left: 10px;
-  border-left: 3px solid #10a37f;
-}
-
-.wechat-style :deep(p) {
-  margin-bottom: 15px;
-  text-align: justify;
-  letter-spacing: 0.5px;
-}
-
-.wechat-style :deep(strong) {
-  color: #10a37f;
-  font-weight: 600;
-}
-
-.wechat-style :deep(blockquote) {
-  background: #f5f5f5;
-  border-left: 3px solid #10a37f;
-  padding: 12px 16px;
-  margin: 16px 0;
-  color: #595959;
-  font-size: 14px;
-}
-
-.wechat-style :deep(ul),
-.wechat-style :deep(ol) {
-  margin: 12px 0;
-  padding-left: 24px;
-}
-
-.wechat-style :deep(li) {
-  margin-bottom: 8px;
 }
 
 /* 空状态 */

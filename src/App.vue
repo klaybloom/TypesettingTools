@@ -131,7 +131,7 @@
 
     <!-- 样式控制面板 -->
     <StylePanel 
-      v-model:settings="styleSettings"
+      v-model:settings="articleStyleSettings"
       :visible="showStylePanel"
       @toggle="showStylePanel = !showStylePanel"
     />
@@ -150,7 +150,7 @@ import { ref } from 'vue'
 import Editor from './components/Editor.vue'
 import Preview from './components/Preview.vue'
 import StylePanel from './components/StylePanel.vue'
-import { defaultSettings } from './utils/config.js'
+import { defaultArticleStyleSettings } from './utils/config.js'
 import { useAppearance } from './composables/useAppearance.js'
 import { usePersistentStyleSettings } from './composables/usePersistentStyleSettings.js'
 import { useRenderedDocument } from './composables/useRenderedDocument.js'
@@ -165,8 +165,8 @@ const previewRef = ref(null)
 
 const { theme, colorMode, showThemeMenu, themeName, setColorMode, toggleThemeMenu, changeTheme } = useAppearance()
 const { toast, showToast } = useToast()
-const { styleSettings } = usePersistentStyleSettings(defaultSettings)
-const { rawContent, formattedContent, charCount, readingTime } = useRenderedDocument(styleSettings)
+const { articleStyleSettings } = usePersistentStyleSettings(defaultArticleStyleSettings)
+const { rawContent, formattedContent, charCount, readingTime } = useRenderedDocument(articleStyleSettings)
 
 async function copyHtml() {
   if (!formattedContent.value) return

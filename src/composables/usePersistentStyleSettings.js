@@ -1,9 +1,9 @@
 import { onMounted, ref, watch } from 'vue'
 
-export function usePersistentStyleSettings(defaultSettings) {
-  const styleSettings = ref({ ...defaultSettings })
+export function usePersistentStyleSettings(defaultArticleStyleSettings) {
+  const articleStyleSettings = ref({ ...defaultArticleStyleSettings })
 
-  watch(styleSettings, (value) => {
+  watch(articleStyleSettings, (value) => {
     localStorage.setItem('styleSettings', JSON.stringify(value))
   }, { deep: true })
 
@@ -13,11 +13,11 @@ export function usePersistentStyleSettings(defaultSettings) {
 
     try {
       const parsed = JSON.parse(savedSettings)
-      styleSettings.value = { ...defaultSettings, ...parsed }
+      articleStyleSettings.value = { ...defaultArticleStyleSettings, ...parsed }
     } catch (_) {
       // Ignore corrupt persisted settings and fall back to defaults.
     }
   })
 
-  return { styleSettings }
+  return { articleStyleSettings }
 }

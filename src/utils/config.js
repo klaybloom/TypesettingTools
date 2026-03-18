@@ -3,7 +3,7 @@
  * 所有默认设置的唯一来源 (Single Source of Truth)
  */
 
-export const defaultSettings = {
+export const defaultArticleStyleSettings = {
     fontSize: 15,
     lineHeight: 1.75,
     letterSpacing: 0.5,
@@ -29,8 +29,8 @@ export const accentColors = [
     { name: '玫瑰红', value: '#e11d48' }
 ]
 
-// 主题预设
-export const themePresets = [
+// 文章样式预设
+export const articleStylePresets = [
     {
         name: '经典绿',
         settings: { fontSize: 15, lineHeight: 1.75, letterSpacing: 0.5, textColor: '#262626', accentColor: '#10a37f', paragraphMargin: 15, textIndent: false }
@@ -85,4 +85,4 @@ export const themePresets = [
     }
 ]
 
-export default defaultSettings
+export default defaultArticleStyleSettings

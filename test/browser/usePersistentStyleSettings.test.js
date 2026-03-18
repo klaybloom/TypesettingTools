@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
-import { defaultSettings } from '../../src/utils/config.js'
+import { defaultArticleStyleSettings } from '../../src/utils/config.js'
 import { usePersistentStyleSettings } from '../../src/composables/usePersistentStyleSettings.js'
 import { mountComposable } from './mountComposable.js'
 
@@ -15,11 +15,11 @@ describe('usePersistentStyleSettings', () => {
       accentColor: '#ff0000'
     }))
 
-    const { result, unmount } = await mountComposable(() => usePersistentStyleSettings(defaultSettings))
+    const { result, unmount } = await mountComposable(() => usePersistentStyleSettings(defaultArticleStyleSettings))
 
-    expect(result.styleSettings.value.fontSize).toBe(18)
-    expect(result.styleSettings.value.accentColor).toBe('#ff0000')
-    expect(result.styleSettings.value.lineHeight).toBe(defaultSettings.lineHeight)
+    expect(result.articleStyleSettings.value.fontSize).toBe(18)
+    expect(result.articleStyleSettings.value.accentColor).toBe('#ff0000')
+    expect(result.articleStyleSettings.value.lineHeight).toBe(defaultArticleStyleSettings.lineHeight)
 
     await unmount()
   })
@@ -27,18 +27,18 @@ describe('usePersistentStyleSettings', () => {
   it('falls back to defaults when persisted data is invalid', async () => {
     localStorage.setItem('styleSettings', '{bad json')
 
-    const { result, unmount } = await mountComposable(() => usePersistentStyleSettings(defaultSettings))
+    const { result, unmount } = await mountComposable(() => usePersistentStyleSettings(defaultArticleStyleSettings))
 
-    expect(result.styleSettings.value).toEqual({ ...defaultSettings })
+    expect(result.articleStyleSettings.value).toEqual({ ...defaultArticleStyleSettings })
 
     await unmount()
   })
 
   it('persists style changes', async () => {
-    const { result, unmount } = await mountComposable(() => usePersistentStyleSettings(defaultSettings))
+    const { result, unmount } = await mountComposable(() => usePersistentStyleSettings(defaultArticleStyleSettings))
 
-    result.styleSettings.value = {
-      ...result.styleSettings.value,
+    result.articleStyleSettings.value = {
+      ...result.articleStyleSettings.value,
       fontSize: 19
     }
 

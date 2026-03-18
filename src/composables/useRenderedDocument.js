@@ -1,10 +1,10 @@
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { formatText, inlineStyles } from '../utils/formatter.js'
 
-export function useRenderedDocument(styleSettings) {
+export function useRenderedDocument(articleStyleSettings) {
   const rawContent = ref('')
   const debouncedContent = ref('')
-  const debouncedSettings = ref({ ...styleSettings.value })
+  const debouncedSettings = ref({ ...articleStyleSettings.value })
 
   let contentDebounceTimer = null
   let settingsDebounceTimer = null
@@ -16,7 +16,7 @@ export function useRenderedDocument(styleSettings) {
     }, 300)
   }, { immediate: true })
 
-  watch(styleSettings, (newVal) => {
+  watch(articleStyleSettings, (newVal) => {
     clearTimeout(settingsDebounceTimer)
     settingsDebounceTimer = setTimeout(() => {
       debouncedSettings.value = { ...newVal }

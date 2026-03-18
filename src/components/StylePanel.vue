@@ -10,12 +10,12 @@
           <span class="panel-title">样式设置</span>
         </div>
         <div class="panel-content">
-        <!-- 主题预设 -->
+        <!-- 排版预设 -->
         <div class="setting-group">
-          <label>主题预设</label>
+          <label>排版预设</label>
           <div class="preset-cards">
             <button
-              v-for="preset in themePresets"
+              v-for="preset in articleStylePresets"
               :key="preset.name"
               class="preset-card"
               :class="{ active: isPresetActive(preset) }"
@@ -145,7 +145,7 @@
 </template>
 
 <script setup>
-import { defaultSettings, textColors, accentColors, themePresets } from '../utils/config.js'
+import { defaultArticleStyleSettings, textColors, accentColors, articleStylePresets } from '../utils/config.js'
 
 const props = defineProps({
   settings: {
@@ -175,7 +175,7 @@ function isPresetActive(preset) {
 }
 
 function resetSettings() {
-  emit('update:settings', { ...defaultSettings })
+  emit('update:settings', { ...defaultArticleStyleSettings })
 }
 </script>
 
