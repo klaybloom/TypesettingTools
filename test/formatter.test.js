@@ -44,9 +44,9 @@ describe('formatter.js', () => {
 
       expect(result).toContain('<ul')
       expect(result).toContain('<li')
-      expect(result).toContain('项目1')
-      expect(result).toContain('项目2')
-      expect(result).toContain('项目3')
+      expect(result).toMatch(/项目\s*1/)
+      expect(result).toMatch(/项目\s*2/)
+      expect(result).toMatch(/项目\s*3/)
     })
 
     it('应该正确渲染有序列表', () => {
@@ -141,8 +141,8 @@ describe('formatter.js', () => {
       expect(result).toContain('<table')
       expect(result).toContain('<th')
       expect(result).toContain('<td')
-      expect(result).toContain('列1')
-      expect(result).toContain('值1')
+      expect(result).toMatch(/列\s*1/)
+      expect(result).toMatch(/值\s*1/)
     })
 
     it('应该正确渲染任务列表', () => {

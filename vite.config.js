@@ -27,14 +27,6 @@ export default defineConfig({
                 }
             }
         },
-        // 压缩优化
-        minify: 'terser',
-        terserOptions: {
-            compress: {
-                drop_console: true, // 生产环境移除 console
-                drop_debugger: true
-            }
-        },
         // chunk 大小警告阈值
         chunkSizeWarningLimit: 1000,
         // 启用 CSS 代码分割

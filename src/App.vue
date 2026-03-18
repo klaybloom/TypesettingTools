@@ -146,107 +146,27 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import Editor from './components/Editor.vue'
 import Preview from './components/Preview.vue'
 import StylePanel from './components/StylePanel.vue'
-import { formatText, inlineStyles } from './utils/formatter.js'
 import { defaultSettings } from './utils/config.js'
-
-// 主题状态
-const theme = ref('default')
-const colorMode = ref('light')
-
-// 内容状态
-const rawContent = ref('')
-const debouncedContent = ref('')
-const debouncedSettings = ref({ ...defaultSettings })
+import { useAppearance } from './composables/useAppearance.js'
+import { usePersistentStyleSettings } from './composables/usePersistentStyleSettings.js'
+import { useRenderedDocument } from './composables/useRenderedDocument.js'
+import { useToast } from './composables/useToast.js'
 
 // UI 状态
 const previewMode = ref('mobile')
 const showStylePanel = ref(false)
-const showThemeMenu = ref(false)
 const copySuccess = ref(false)
-const toast = ref({ show: false, message: '', type: 'success' })
 const scrollRatio = ref(0)
 const previewRef = ref(null)
 
-// 样式设置（从统一配置加载）
-const styleSettings = ref({ ...defaultSettings })
-
-// 防抖定时器
-let contentDebounceTimer = null
-let settingsDebounceTimer = null
-
-// 防抖处理：内容变化
-watch(rawContent, (newVal) => {
-  clearTimeout(contentDebounceTimer)
-  contentDebounceTimer = setTimeout(() => {
-    debouncedContent.value = newVal
-  }, 300)
-}, { immediate: true })
-
-// 防抖处理：样式变化
-watch(styleSettings, (newVal) => {
-  clearTimeout(settingsDebounceTimer)
-  settingsDebounceTimer = setTimeout(() => {
-    debouncedSettings.value = { ...newVal }
-  }, 150)
-}, { deep: true, immediate: true })
-
-// 计算属性 - 自动排版：使用防抖后的内容和样式
-const formattedContent = computed(() => {
-  if (!debouncedContent.value.trim()) return ''
-  return inlineStyles(formatText(debouncedContent.value, debouncedSettings.value))
-})
-
-const hasContent = computed(() => rawContent.value.trim().length > 0)
-const charCount = computed(() => rawContent.value.replace(/\s/g, '').length)
-
-// 预计阅读时间（分钟）- 基于中文平均阅读速度 300-500 字/分钟
-const readingTime = computed(() => {
-  const chars = charCount.value
-  if (chars === 0) return 0
-  const minutes = Math.ceil(chars / 400) // 使用 400 字/分钟作为平均速度
-  return minutes
-})
-
-const themeName = computed(() => {
-  const map = {
-    default: '默认',
-    notion: '象牙暖',
-    vercel: '极简灰',
-    linear: '极光紫',
-    macaron: '马卡龙',
-    cyberpunk: '赛博朋克',
-    retro: '迈阿密',
-    neon: '霓虹青'
-  }
-  return map[theme.value] || '默认'
-})
-
-// 方法
-function setColorMode(mode) {
-  colorMode.value = mode
-  localStorage.setItem('colorMode', mode)
-}
-
-// 方法
-function toggleThemeMenu() {
-  showThemeMenu.value = !showThemeMenu.value
-}
-
-function changeTheme(newTheme) {
-  theme.value = newTheme
-  localStorage.setItem('theme', newTheme)
-  showThemeMenu.value = false
-}
-
-function closeGlobalMenus(e) {
-  if (!e.target.closest('.theme-dropdown')) {
-    showThemeMenu.value = false
-  }
-}
+const { theme, colorMode, showThemeMenu, themeName, setColorMode, toggleThemeMenu, changeTheme } = useAppearance()
+const { toast, showToast } = useToast()
+const { styleSettings } = usePersistentStyleSettings(defaultSettings)
+const { rawContent, formattedContent, charCount, readingTime } = useRenderedDocument(styleSettings)
 
 async function copyHtml() {
   if (!formattedContent.value) return
@@ -294,11 +214,6 @@ async function copyHtml() {
       showToast('复制失败，请手动复制', 'error')
     }
   }
-}
-
-function showToast(message, type = 'success') {
-  toast.value = { show: true, message, type }
-  setTimeout(() => toast.value.show = false, 2500)
 }
 
 // （已移除点击空白处关闭样式面板逻辑，改为常驻推挤排版）
@@ -392,51 +307,6 @@ async function exportImage() {
   }
 }
 
-// 持久化样式设置到 localStorage
-watch(styleSettings, (val) => {
-  localStorage.setItem('styleSettings', JSON.stringify(val))
-}, { deep: true })
-
-// 初始化
-onMounted(() => {
-
-
-  // 恢复保存的样式设置
-  const savedSettings = localStorage.getItem('styleSettings')
-  if (savedSettings) {
-    try {
-      const parsed = JSON.parse(savedSettings)
-      styleSettings.value = { ...defaultSettings, ...parsed }
-    } catch (_) { /* ignore corrupt data */ }
-  }
-
-  // 恢复主题和深浅模式
-  const savedTheme = localStorage.getItem('theme') || 'default'
-  const savedMode = localStorage.getItem('colorMode')
-
-  if (savedMode) {
-    colorMode.value = savedMode
-    theme.value = ['light', 'dark'].includes(savedTheme) ? 'default' : savedTheme
-  } else {
-    // 兼容旧版本设置
-    if (savedTheme === 'dark') {
-      colorMode.value = 'dark'
-      theme.value = 'default'
-    } else if (savedTheme === 'light') {
-      colorMode.value = 'light'
-      theme.value = 'default'
-    } else {
-      theme.value = savedTheme
-      colorMode.value = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    }
-  }
-
-  document.addEventListener('click', closeGlobalMenus)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', closeGlobalMenus)
-})
 </script>
 
 <style>
