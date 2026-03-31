@@ -14,6 +14,8 @@ describe('useRenderedDocument', () => {
     const articleStyleSettings = ref({ ...defaultArticleStyleSettings })
     const { result, unmount } = await mountComposable(() => useRenderedDocument(articleStyleSettings))
 
+    expect(result.rawContent.value).toContain('# Markdown 语法示例')
+
     result.rawContent.value = '测试 文本'
     await nextTick()
 
@@ -51,6 +53,23 @@ describe('useRenderedDocument', () => {
     await nextTick()
 
     expect(result.formattedContent.value).toContain('font-size: 18px')
+
+    await unmount()
+  })
+
+  it('renders the default markdown sample after debounce', async () => {
+    vi.useFakeTimers()
+    const articleStyleSettings = ref({ ...defaultArticleStyleSettings })
+    const { result, unmount } = await mountComposable(() => useRenderedDocument(articleStyleSettings))
+
+    expect(result.formattedContent.value).toBe('')
+
+    vi.advanceTimersByTime(300)
+    await nextTick()
+
+    expect(result.formattedContent.value).toContain('Markdown 语法示例')
+    expect(result.formattedContent.value).toContain('<table')
+    expect(result.formattedContent.value).toContain('<pre')
 
     await unmount()
   })

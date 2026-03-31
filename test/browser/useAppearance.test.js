@@ -14,14 +14,14 @@ describe('useAppearance', () => {
   })
 
   it('restores theme and color mode from storage', async () => {
-    localStorage.setItem('theme', 'macaron')
+    localStorage.setItem('theme', 'fashion')
     localStorage.setItem('colorMode', 'dark')
 
     const { result, unmount } = await mountComposable(() => useAppearance())
 
-    expect(result.theme.value).toBe('macaron')
+    expect(result.theme.value).toBe('fashion')
     expect(result.colorMode.value).toBe('dark')
-    expect(result.themeName.value).toBe('马卡龙')
+    expect(result.themeName.value).toBe('时尚风格')
 
     await unmount()
   })

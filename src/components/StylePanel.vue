@@ -194,9 +194,9 @@ function resetSettings() {
 .panel-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(20, 28, 40, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .style-panel {
@@ -205,21 +205,24 @@ function resetSettings() {
   top: 0;
   bottom: 0;
   width: 304px;
-  background: var(--bg-primary);
-  border-left: 1px solid var(--border-color);
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
+  background: var(--glass-elevated);
+  border-left: 1px solid var(--ui-muted-border);
+  box-shadow: -18px 0 42px var(--shadow-color);
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .panel-header {
-  padding: 10px 14px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .panel-title {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   color: var(--text-primary);
 }
 
@@ -252,7 +255,7 @@ function resetSettings() {
 .setting-control input[type="range"] {
   flex: 1;
   height: 3px;
-  background: var(--bg-tertiary);
+  background: var(--border-color);
   border-radius: 2px;
   appearance: none;
   cursor: pointer;

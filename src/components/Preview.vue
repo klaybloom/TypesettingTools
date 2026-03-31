@@ -98,8 +98,8 @@ const emptyState = computed(() => `
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 10px;
-  background: var(--bg-secondary);
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
   overflow: hidden;
 }
 
@@ -221,8 +221,8 @@ const emptyState = computed(() => `
   max-width: 680px;
   display: flex;
   overflow: hidden;
-  background: var(--bg-primary);
-  border-radius: var(--radius-md);
+  background: var(--glass-surface);
+  border-radius: 24px;
   box-shadow: var(--shadow-md);
   padding: var(--spacing-lg);
 }

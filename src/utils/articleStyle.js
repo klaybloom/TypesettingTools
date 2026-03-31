@@ -8,7 +8,7 @@ function getBaseStyles(settings) {
 
 function getHeadingStyles(settings) {
   return {
-    h1: `font-size: 22px; font-weight: 700; color: ${settings.textColor}; margin-bottom: 24px; line-height: 1.4; text-align: center;`,
+    h1: `display: table; width: auto; font-size: 22px; font-weight: 700; color: #ffffff; background: ${settings.accentColor}; padding: 12px 18px; border-radius: 12px; margin: 0 auto 24px; line-height: 1.4; text-align: center;`,
     h2: `font-size: 18px; font-weight: 600; color: ${settings.textColor}; margin: 24px 0 16px 0; padding-left: 12px; border-left: 4px solid ${settings.accentColor}; line-height: 1.5;`,
     h3: `font-size: 16px; font-weight: 600; color: ${settings.textColor}; margin: 20px 0 12px 0;`
   }

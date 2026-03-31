@@ -382,16 +382,19 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .editor-topbar {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 14px 18px;
+  min-height: 60px;
   border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-primary);
+  background: rgba(255, 255, 255, 0.14);
+  position: relative;
+  z-index: 3;
 }
 
 .section-title {
@@ -415,11 +418,10 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   flex: 1;
   min-width: 0;
   padding: 0;
-  height: 24px;
+  min-height: 28px;
   background: transparent;
   border-bottom: none;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: visible;
   scrollbar-width: none;
 }
 
@@ -431,21 +433,23 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 6px;
+  border-radius: 999px;
   color: var(--text-secondary);
-  background: transparent;
-  border: none;
+  background: var(--ui-muted-bg);
+  border: 1px solid transparent;
   cursor: pointer;
   transition: all var(--transition-fast);
-  min-width: 22px;
-  height: 22px;
+  min-width: 28px;
+  height: 28px;
 }
 
 .toolbar-btn:hover {
-  background: var(--bg-tertiary);
-  color: var(--accent-primary);
+  background: var(--ui-muted-bg-hover);
+  color: var(--text-primary);
+  border-color: var(--ui-muted-border);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .toolbar-btn:active {
@@ -458,7 +462,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 .toolbar-btn.with-arrow {
   gap: 2px;
-  padding: 4px 5px;
+  padding: 6px 8px;
 }
 
 .arrow-icon {
@@ -479,26 +483,29 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   width: 1px;
   height: 14px;
   background: var(--border-color);
-  margin: 0 2px;
+  margin: 0 4px;
 }
 
 /* 下拉菜单 */
 .toolbar-dropdown {
   position: relative;
+  z-index: 4;
 }
 
 .dropdown-menu {
   position: absolute;
   top: 100%;
   left: 0;
-  margin-top: 4px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  margin-top: 8px;
+  background: var(--glass-elevated);
+  border: 1px solid var(--ui-muted-border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-lg);
   z-index: 100;
   min-width: 150px;
-  padding: 6px;
+  padding: 8px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .dropdown-menu button {
@@ -512,13 +519,13 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   color: var(--text-primary);
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   cursor: pointer;
 }
 
 .dropdown-menu button:hover {
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
+  background: var(--ui-muted-bg);
+  color: var(--text-primary);
 }
 
 .menu-icon {
@@ -557,7 +564,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   flex: 1;
   width: 100%;
   height: 100%;
-  padding: 16px 20px;
+  padding: 20px 22px;
   border: none;
   resize: none;
   outline: none;
@@ -565,15 +572,15 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   color: var(--text-primary);
   font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
   font-size: 14px;
-  line-height: 1.6;
-  caret-color: var(--accent-primary);
+  line-height: 1.72;
+  caret-color: var(--ui-primary);
   box-shadow: inset 0 0 0 1px transparent;
   transition: box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .editor-textarea:focus {
-  box-shadow: inset 0 0 0 1px var(--accent-primary);
-  background: var(--bg-primary);
+  box-shadow: inset 0 0 0 1px var(--border-color);
+  background: var(--glass-surface);
 }
 
 .editor-textarea::placeholder { color: var(--text-tertiary); }

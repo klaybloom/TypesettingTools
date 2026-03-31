@@ -5,11 +5,11 @@
 
 export const defaultArticleStyleSettings = {
     fontSize: 15,
-    lineHeight: 1.75,
+    lineHeight: 1.8,
     letterSpacing: 0.5,
-    textColor: '#262626',
-    accentColor: '#10a37f',
-    paragraphMargin: 15,
+    textColor: '#2B2B2B',
+    accentColor: '#1F7A62',
+    paragraphMargin: 16,
     textIndent: false
 }
 
@@ -32,56 +32,20 @@ export const accentColors = [
 // 文章样式预设
 export const articleStylePresets = [
     {
-        name: '经典绿',
-        settings: { fontSize: 15, lineHeight: 1.75, letterSpacing: 0.5, textColor: '#262626', accentColor: '#10a37f', paragraphMargin: 15, textIndent: false }
+        name: '经典公号',
+        settings: { fontSize: 15, lineHeight: 1.8, letterSpacing: 0.5, textColor: '#2B2B2B', accentColor: '#1F7A62', paragraphMargin: 16, textIndent: false }
     },
     {
-        name: '科技蓝',
-        settings: { fontSize: 15, lineHeight: 1.75, letterSpacing: 0.5, textColor: '#262626', accentColor: '#1a73e8', paragraphMargin: 15, textIndent: false }
+        name: '优雅专栏',
+        settings: { fontSize: 16, lineHeight: 1.92, letterSpacing: 0.6, textColor: '#4A4037', accentColor: '#B86A4B', paragraphMargin: 18, textIndent: true }
     },
     {
-        name: '浅薄紫',
-        settings: { fontSize: 16, lineHeight: 1.8, letterSpacing: 0.5, textColor: '#3f3f3f', accentColor: '#7c3aed', paragraphMargin: 16, textIndent: true }
+        name: '极简说明',
+        settings: { fontSize: 15, lineHeight: 1.72, letterSpacing: 0.3, textColor: '#1F2937', accentColor: '#4F6B95', paragraphMargin: 14, textIndent: false }
     },
     {
-        name: '暖橙调',
-        settings: { fontSize: 15, lineHeight: 1.75, letterSpacing: 0.5, textColor: '#3f3f3f', accentColor: '#ff6b35', paragraphMargin: 15, textIndent: false }
-    },
-    {
-        name: '知乎体',
-        settings: { fontSize: 16, lineHeight: 2.0, letterSpacing: 0.5, textColor: '#262626', accentColor: '#0066ff', paragraphMargin: 18, textIndent: true }
-    },
-    {
-        name: '商务灰',
-        settings: { fontSize: 15, lineHeight: 1.8, letterSpacing: 0.3, textColor: '#333333', accentColor: '#5a5a5a', paragraphMargin: 14, textIndent: false }
-    },
-    {
-        name: '森林绿',
-        settings: { fontSize: 15, lineHeight: 1.75, letterSpacing: 0.5, textColor: '#2d3436', accentColor: '#00b894', paragraphMargin: 15, textIndent: false }
-    },
-    {
-        name: '樱花粉',
-        settings: { fontSize: 16, lineHeight: 1.85, letterSpacing: 0.6, textColor: '#4a4a4a', accentColor: '#fd79a8', paragraphMargin: 16, textIndent: true }
-    },
-    {
-        name: '深海蓝',
-        settings: { fontSize: 15, lineHeight: 1.75, letterSpacing: 0.4, textColor: '#2c3e50', accentColor: '#0984e3', paragraphMargin: 15, textIndent: false }
-    },
-    {
-        name: '琥珀橙',
-        settings: { fontSize: 15, lineHeight: 1.8, letterSpacing: 0.5, textColor: '#3f3f3f', accentColor: '#e17055', paragraphMargin: 15, textIndent: false }
-    },
-    {
-        name: '薄荷绿',
-        settings: { fontSize: 16, lineHeight: 1.85, letterSpacing: 0.5, textColor: '#2d3436', accentColor: '#55efc4', paragraphMargin: 16, textIndent: false }
-    },
-    {
-        name: '葡萄紫',
-        settings: { fontSize: 15, lineHeight: 1.75, letterSpacing: 0.5, textColor: '#2d3436', accentColor: '#6c5ce7', paragraphMargin: 15, textIndent: false }
-    },
-    {
-        name: '夕阳红',
-        settings: { fontSize: 16, lineHeight: 1.9, letterSpacing: 0.6, textColor: '#3f3f3f', accentColor: '#d63031', paragraphMargin: 17, textIndent: true }
+        name: '教程手册',
+        settings: { fontSize: 15, lineHeight: 1.86, letterSpacing: 0.4, textColor: '#243240', accentColor: '#C06B2D', paragraphMargin: 17, textIndent: false }
     }
 ]
 

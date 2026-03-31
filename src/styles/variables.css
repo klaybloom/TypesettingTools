@@ -1,30 +1,45 @@
 /* ====================================
-   公众号排版工具 - CSS 变量系统
+   公众号排版工具 - UI 主题变量
    ==================================== */
 
 :root {
-  /* 主题色彩 - 浅色模式（黑白灰页面背景） */
   --bg-primary: #ffffff;
-  --bg-secondary: #f5f5f5;
-  --bg-tertiary: #e8e8e8;
-  --bg-editor: #fafafa;
+  --bg-secondary: #f5f7fa;
+  --bg-tertiary: #eef2f7;
+  --bg-editor: rgba(255, 255, 255, 0.64);
 
-  /* 文字颜色 - 严禁纯黑 */
-  --text-primary: #262626;
-  --text-secondary: #595959;
-  --text-tertiary: #8c8c8c;
-  --text-inverse: #ffffff;
+  --text-primary: #1f2937;
+  --text-secondary: #66758a;
+  --text-tertiary: #93a1b2;
+  --text-inverse: #f8fafc;
 
-  /* 强调色 - 保留彩色按钮 */
-  --accent-primary: #10a37f;
-  --accent-hover: #0d8a6a;
-  --accent-subtle: rgba(16, 163, 127, 0.1);
+  --accent-primary: #6c7c92;
+  --accent-hover: #546174;
+  --accent-subtle: rgba(108, 124, 146, 0.12);
 
-  /* 边框与分隔, 使用 rgba 融入不同层级的背景 */
-  --border-color: rgba(0, 0, 0, 0.12);
-  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-color: #dce4ec;
+  --border-subtle: rgba(220, 228, 236, 0.72);
 
-  /* 排版参数 - 知乎专家建议 */
+  --page-gradient:
+    radial-gradient(circle at top left, rgba(158, 187, 229, 0.28), transparent 28%),
+    radial-gradient(circle at top right, rgba(191, 219, 224, 0.24), transparent 24%),
+    linear-gradient(180deg, #ecf3fb 0%, #edf4f8 38%, #f6f8fb 100%);
+  --page-texture:
+    linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 42%),
+    linear-gradient(225deg, rgba(206, 220, 236, 0.16) 0%, rgba(206, 220, 236, 0) 38%);
+  --glass-surface: rgba(255, 255, 255, 0.82);
+  --glass-elevated: rgba(255, 255, 255, 0.92);
+  --glass-highlight: rgba(255, 255, 255, 0.72);
+  --shadow-color: rgba(124, 148, 178, 0.1);
+
+  --ui-primary: #1b2330;
+  --ui-primary-hover: #101827;
+  --ui-primary-text: #f8fafc;
+  --ui-muted-bg: rgba(238, 242, 247, 0.95);
+  --ui-muted-bg-hover: rgba(245, 248, 251, 0.98);
+  --ui-muted-text: #425162;
+  --ui-muted-border: rgba(226, 233, 241, 0.95);
+
   --title-font-size: 17px;
   --body-font-size: 15px;
   --note-font-size: 13px;
@@ -32,7 +47,6 @@
   --letter-spacing: 0.5px;
   --paragraph-margin: 15px;
 
-  /* 间距 */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
@@ -40,334 +54,223 @@
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
 
-  /* 圆角 */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
 
-  /* 阴影 - 现代多层柔软阴影 */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 15px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.05), 0 20px 25px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 10px 18px rgba(133, 149, 170, 0.12);
+  --shadow-md: 0 20px 44px var(--shadow-color);
+  --shadow-lg: 0 22px 44px rgba(123, 141, 167, 0.16);
 
-  /* 过渡 - 丝滑动效曲线 */
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 深色主题 - 页面黑白灰，按钮保留彩色 */
 [data-mode="dark"] {
-  --bg-primary: #0d0d0d;
-  --bg-secondary: #151515;
-  --bg-tertiary: #1f1f1f;
-  --bg-editor: #141414;
+  --bg-primary: #121926;
+  --bg-secondary: #0f1722;
+  --bg-tertiary: #1a2433;
+  --bg-editor: rgba(17, 24, 37, 0.82);
 
-  --text-primary: #e8e8e8;
-  --text-secondary: #a3a3a3;
-  --text-tertiary: #666666;
-  --text-inverse: #0d0d0d;
+  --text-primary: #e8eef5;
+  --text-secondary: #97a6b8;
+  --text-tertiary: #718198;
+  --text-inverse: #101722;
 
-  --accent-primary: #10a37f;
-  --accent-hover: #1ec99e;
-  --accent-subtle: rgba(16, 163, 127, 0.15);
+  --accent-primary: #a5b4c7;
+  --accent-hover: #c2ccda;
+  --accent-subtle: rgba(165, 180, 199, 0.12);
 
-  --border-color: rgba(255, 255, 255, 0.12);
-  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-color: #2a3647;
+  --border-subtle: rgba(42, 54, 71, 0.88);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3), 0 10px 15px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4), 0 20px 25px rgba(0, 0, 0, 0.5);
+  --page-gradient:
+    radial-gradient(circle at top left, rgba(88, 107, 141, 0.24), transparent 28%),
+    radial-gradient(circle at top right, rgba(58, 87, 99, 0.2), transparent 24%),
+    linear-gradient(180deg, #0d1420 0%, #0f1722 42%, #121a27 100%);
+  --page-texture:
+    linear-gradient(140deg, rgba(148, 163, 184, 0.06) 0%, rgba(148, 163, 184, 0) 40%),
+    linear-gradient(220deg, rgba(71, 85, 105, 0.12) 0%, rgba(71, 85, 105, 0) 46%);
+  --glass-surface: rgba(18, 26, 38, 0.86);
+  --glass-elevated: rgba(22, 31, 44, 0.94);
+  --glass-highlight: rgba(255, 255, 255, 0.04);
+  --shadow-color: rgba(0, 0, 0, 0.26);
+
+  --ui-primary: #f3f6fa;
+  --ui-primary-hover: #ffffff;
+  --ui-primary-text: #101722;
+  --ui-muted-bg: rgba(23, 33, 47, 0.96);
+  --ui-muted-bg-hover: rgba(28, 39, 55, 0.98);
+  --ui-muted-text: #d2dce8;
+  --ui-muted-border: rgba(42, 54, 71, 0.95);
+
+  --shadow-sm: 0 12px 22px rgba(0, 0, 0, 0.22);
+  --shadow-md: 0 24px 52px rgba(0, 0, 0, 0.26);
+  --shadow-lg: 0 28px 54px rgba(0, 0, 0, 0.3);
 }
 
-/* 象牙暖 (Notion 风格) - 适合长时间阅读和写作 */
-[data-theme="notion"] {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f7f6f3;
-  --bg-tertiary: #edece9;
-  --bg-editor: #ffffff;
+[data-theme="fashion"] {
+  --bg-primary: #fffaf6;
+  --bg-secondary: #faf8f6;
+  --bg-tertiary: #f3ebe4;
+  --bg-editor: rgba(255, 250, 246, 0.72);
 
-  --text-primary: #37352f;
-  --text-secondary: #787774;
-  --text-tertiary: #9c9b98;
-  --text-inverse: #ffffff;
+  --text-primary: #161616;
+  --text-secondary: #6e6a67;
+  --text-tertiary: #9a9088;
+  --text-inverse: #faf7f3;
 
-  --accent-primary: #ea7271;
-  --accent-hover: #d35f5f;
-  --accent-subtle: rgba(234, 114, 113, 0.12);
+  --accent-primary: #d96b4d;
+  --accent-hover: #bf573a;
+  --accent-subtle: rgba(217, 107, 77, 0.12);
 
-  --border-color: rgba(55, 53, 47, 0.16);
-  --border-subtle: rgba(55, 53, 47, 0.06);
+  --border-color: #e8dfd7;
+  --border-subtle: rgba(232, 223, 215, 0.78);
+
+  --page-gradient:
+    radial-gradient(circle at top left, rgba(245, 210, 188, 0.3), transparent 28%),
+    radial-gradient(circle at top right, rgba(230, 184, 166, 0.18), transparent 22%),
+    linear-gradient(180deg, #fff8f3 0%, #faf4ef 40%, #f7efe9 100%);
+  --page-texture:
+    linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 36%),
+    linear-gradient(120deg, rgba(217, 107, 77, 0.06) 0%, rgba(217, 107, 77, 0) 55%),
+    radial-gradient(circle at 20% 18%, rgba(255,255,255,0.22) 0 8%, transparent 9%);
+  --glass-surface: rgba(255, 250, 246, 0.84);
+  --glass-elevated: rgba(255, 250, 246, 0.94);
+  --glass-highlight: rgba(255, 255, 255, 0.74);
+  --shadow-color: rgba(183, 120, 96, 0.1);
+
+  --ui-primary: #111111;
+  --ui-primary-hover: #000000;
+  --ui-primary-text: #f8f2ec;
+  --ui-muted-bg: rgba(248, 241, 235, 0.96);
+  --ui-muted-bg-hover: rgba(252, 245, 239, 0.98);
+  --ui-muted-text: #5c5148;
+  --ui-muted-border: rgba(232, 223, 215, 0.96);
 }
 
-[data-theme="notion"][data-mode="dark"] {
-  --bg-primary: #191919;
-  --bg-secondary: #202020;
-  --bg-tertiary: #2a2a2a;
-  --bg-editor: #191919;
+[data-theme="fashion"][data-mode="dark"] {
+  --bg-primary: #1b1715;
+  --bg-secondary: #141414;
+  --bg-tertiary: #241e1b;
+  --bg-editor: rgba(28, 24, 22, 0.84);
 
-  --text-primary: #e0e0e0;
-  --text-secondary: #9b9b9b;
-  --text-tertiary: #737373;
-  --text-inverse: #ffffff;
+  --text-primary: #f6efe8;
+  --text-secondary: #b7aaa0;
+  --text-tertiary: #8f7d72;
+  --text-inverse: #141414;
 
-  --accent-primary: #ea7271;
-  --accent-hover: #ff8584;
-  --accent-subtle: rgba(234, 114, 113, 0.2);
+  --accent-primary: #e08a5b;
+  --accent-hover: #f3a273;
+  --accent-subtle: rgba(224, 138, 91, 0.14);
 
-  --border-color: rgba(255, 255, 255, 0.12);
-  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-color: #3a312c;
+  --border-subtle: rgba(58, 49, 44, 0.9);
+
+  --page-gradient:
+    radial-gradient(circle at top left, rgba(106, 65, 46, 0.32), transparent 28%),
+    radial-gradient(circle at top right, rgba(74, 52, 44, 0.22), transparent 22%),
+    linear-gradient(180deg, #121212 0%, #141414 42%, #1b1715 100%);
+  --page-texture:
+    linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 42%),
+    linear-gradient(120deg, rgba(224, 138, 91, 0.08) 0%, rgba(224, 138, 91, 0) 58%);
+  --glass-surface: rgba(28, 24, 22, 0.9);
+  --glass-elevated: rgba(34, 28, 25, 0.94);
+  --glass-highlight: rgba(255, 255, 255, 0.04);
+  --shadow-color: rgba(0, 0, 0, 0.28);
+
+  --ui-primary: #f6efe8;
+  --ui-primary-hover: #fff6ee;
+  --ui-primary-text: #141414;
+  --ui-muted-bg: rgba(33, 28, 26, 0.96);
+  --ui-muted-bg-hover: rgba(40, 34, 31, 0.98);
+  --ui-muted-text: #e2d2c6;
+  --ui-muted-border: rgba(58, 49, 44, 0.95);
 }
 
-/* 极简灰 (Vercel 风格) - 纯正黑白 */
-[data-theme="vercel"] {
-  --bg-primary: #ffffff;
-  --bg-secondary: #fafafa;
-  --bg-tertiary: #eaeaea;
-  --bg-editor: #ffffff;
-
-  --text-primary: #000000;
-  --text-secondary: #666666;
-  --text-tertiary: #888888;
-  --text-inverse: #ffffff;
-
-  --accent-primary: #000000;
-  --accent-hover: #333333;
-  --accent-subtle: rgba(0, 0, 0, 0.08);
-
-  --border-color: rgba(0, 0, 0, 0.15);
-  --border-subtle: rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="vercel"][data-mode="dark"] {
-  --bg-primary: #000000;
-  --bg-secondary: #111111;
-  --bg-tertiary: #222222;
-  --bg-editor: #000000;
-
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
-  --text-tertiary: #666666;
-  --text-inverse: #000000;
-
-  --accent-primary: #ffffff;
-  --accent-hover: #cccccc;
-  --accent-subtle: rgba(255, 255, 255, 0.15);
-
-  --border-color: rgba(255, 255, 255, 0.15);
-  --border-subtle: rgba(255, 255, 255, 0.05);
-}
-
-/* 极光紫 (Linear 风格) - 深色神秘极客感 */
-[data-theme="linear"] {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f4f5f8;
-  --bg-tertiary: #ebecf0;
-  --bg-editor: #ffffff;
-
-  --text-primary: #1f232b;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --text-inverse: #ffffff;
-
-  --accent-primary: #5e6ad2;
-  --accent-hover: #4b55c9;
-  --accent-subtle: rgba(94, 106, 210, 0.1);
-
-  --border-color: rgba(0, 0, 0, 0.08);
-  --border-subtle: rgba(0, 0, 0, 0.04);
-}
-
-[data-theme="linear"][data-mode="dark"] {
-  --bg-primary: #0e0f11;
-  --bg-secondary: #17181c;
-  --bg-tertiary: #23252a;
-  --bg-editor: #0e0f11;
-
-  --text-primary: #f2f2f3;
-  --text-secondary: #8a8f98;
-  --text-tertiary: #60646c;
-  --text-inverse: #000000;
-
-  --accent-primary: #5e6ad2;
-  --accent-hover: #6975e8;
-  --accent-subtle: rgba(94, 106, 210, 0.2);
-
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.04);
-}
-
-/* 马卡龙 (Macaron 风格) - 糖果粉彩，活泼可爱 */
-[data-theme="macaron"] {
-  --bg-primary: #fffcfd;
-  --bg-secondary: #fff5f8;
-  --bg-tertiary: #ffe4eb;
-  --bg-editor: #ffffff;
-
-  --text-primary: #4a4a4a;
-  --text-secondary: #7a6e6f;
-  --text-tertiary: #a9a09f;
-  --text-inverse: #ffffff;
-
-  --accent-primary: #ff8fb0;
-  --accent-hover: #ff709a;
-  --accent-subtle: rgba(255, 143, 176, 0.15);
-
-  --border-color: rgba(255, 143, 176, 0.2);
-  --border-subtle: rgba(255, 143, 176, 0.08);
-}
-
-[data-theme="macaron"][data-mode="dark"] {
-  --bg-primary: #2d1b2e;
-  --bg-secondary: #3a2536;
-  --bg-tertiary: #4a3043;
-  --bg-editor: #2d1b2e;
-
-  --text-primary: #fcdce6;
-  --text-secondary: #dbb6c3;
-  --text-tertiary: #b08d9c;
-  --text-inverse: #2d1b2e;
-
-  --accent-primary: #ff8fb0;
-  --accent-hover: #ffaacc;
-  --accent-subtle: rgba(255, 143, 176, 0.2);
-
-  --border-color: rgba(255, 143, 176, 0.2);
-  --border-subtle: rgba(255, 143, 176, 0.08);
-}
-
-/* =========================================================
-   撞色 & 炫光主题
-   ========================================================= */
-
-/* 🦿 赛博朋克 (Cyberpunk)
-   黄蓝紫极高对比度，刺眼的霓虹感 */
-[data-theme="cyberpunk"] {
-  --bg-primary: #fcee0a; /* 赛博黄 */
-  --bg-secondary: #ebd900;
-  --bg-tertiary: #d4c400;
-  --bg-editor: #fcee0a;
-  
-  --text-primary: #000000;
-  --text-secondary: #1a1a1a;
-  --text-tertiary: #333333;
-  
-  --accent-primary: #00f0ff; /* 赛博蓝 */
-  --accent-hover: #00d0e0;
-  --accent-subtle: rgba(0, 240, 255, 0.2);
-  
-  --border-color: #ff003c; /* 赛博红 */
-  --border-subtle: rgba(255, 0, 60, 0.3);
-  
-  --shadow-sm: 4px 4px 0px rgba(255, 0, 60, 1);
-  --shadow-md: 6px 6px 0px rgba(255, 0, 60, 1);
-  --shadow-lg: 8px 8px 0px rgba(255, 0, 60, 1);
-  --radius-sm: 0px; /* 赛博朋克不用圆角 */
-  --radius-md: 0px;
-  --radius-lg: 0px;
-}
-
-[data-theme="cyberpunk"][data-mode="dark"] {
-  --bg-primary: #080808;
-  --bg-secondary: #121212;
-  --bg-tertiary: #1c1c1c;
-  --bg-editor: #000000;
-  
-  --text-primary: #00f0ff;
-  --text-secondary: #e2e2e2;
-  --text-tertiary: #a0a0a0;
-  
-  --accent-primary: #ff003c; 
-  --accent-hover: #fcee0a;
-  --accent-subtle: rgba(255, 0, 60, 0.15);
-  
-  --border-color: #00f0ff;
-  --border-subtle: rgba(0, 240, 255, 0.3);
-  
-  --shadow-sm: 4px 4px 0px rgba(0, 240, 255, 0.8);
-  --shadow-md: 6px 6px 0px rgba(0, 240, 255, 0.8);
-  --shadow-lg: 8px 8px 0px rgba(255, 0, 60, 0.8);
-}
-
-/* 📼 迈阿密复古 (Retro / Synthwave)
-   粉紫渐变和冷蓝的撞色，复古 80 年代风 */
 [data-theme="retro"] {
-  --bg-primary: #fff2f9; 
-  --bg-secondary: #ffe1f0;
-  --bg-tertiary: #ffcce5;
-  --bg-editor: #ffffff;
-  
-  --text-primary: #3d1059;
-  --text-secondary: #5e1c8a;
-  --text-tertiary: #8432bd;
-  
-  --accent-primary: #ff1493; /* 深粉色 */
-  --accent-hover: #d1007a;
-  --accent-subtle: rgba(255, 20, 147, 0.15);
-  
-  --border-color: rgba(255, 20, 147, 0.3);
-  --border-subtle: rgba(255, 20, 147, 0.15);
-  
-  --shadow-sm: 0 4px 10px rgba(255, 20, 147, 0.1);
+  --bg-primary: #faf3e7;
+  --bg-secondary: #f3ebdd;
+  --bg-tertiary: #ebe0cf;
+  --bg-editor: rgba(250, 243, 231, 0.78);
+
+  --text-primary: #3e3128;
+  --text-secondary: #7b6858;
+  --text-tertiary: #a48e79;
+  --text-inverse: #f7efe4;
+
+  --accent-primary: #6c7a5c;
+  --accent-hover: #59664b;
+  --accent-subtle: rgba(108, 122, 92, 0.14);
+
+  --border-color: #d8c7b2;
+  --border-subtle: rgba(216, 199, 178, 0.86);
+
+  --page-gradient:
+    radial-gradient(circle at top left, rgba(211, 192, 160, 0.32), transparent 28%),
+    radial-gradient(circle at top right, rgba(190, 207, 177, 0.2), transparent 22%),
+    linear-gradient(180deg, #f6efe3 0%, #f2e9dc 42%, #efe5d8 100%);
+  --page-texture:
+    repeating-linear-gradient(
+      0deg,
+      rgba(123, 104, 88, 0.035) 0 1px,
+      rgba(123, 104, 88, 0) 1px 10px
+    ),
+    linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 42%);
+  --glass-surface: rgba(250, 243, 231, 0.86);
+  --glass-elevated: rgba(250, 243, 231, 0.95);
+  --glass-highlight: rgba(255, 255, 255, 0.56);
+  --shadow-color: rgba(126, 103, 82, 0.12);
+
+  --ui-primary: #5a4334;
+  --ui-primary-hover: #493628;
+  --ui-primary-text: #f7efe4;
+  --ui-muted-bg: rgba(243, 234, 221, 0.96);
+  --ui-muted-bg-hover: rgba(247, 240, 229, 0.98);
+  --ui-muted-text: #645447;
+  --ui-muted-border: rgba(216, 199, 178, 0.95);
 }
 
 [data-theme="retro"][data-mode="dark"] {
-  --bg-primary: #120429; /* 深夜紫 */
-  --bg-secondary: #1e0940;
-  --bg-tertiary: #2a0e59;
-  --bg-editor: #0c021c;
-  
-  --text-primary: #00ffff; /* 复古青 */
-  --text-secondary: #ff71ce; /* 复古粉 */
-  --text-tertiary: #b0a0e0;
-  
-  --accent-primary: #ff71ce;
-  --accent-hover: #00ffff;
-  --accent-subtle: rgba(255, 113, 206, 0.2);
-  
-  --border-color: #00ffff;
-  --border-subtle: rgba(0, 255, 255, 0.2);
-  
-  --shadow-sm: 0 4px 12px rgba(0, 255, 255, 0.2), 0 0 8px rgba(255, 113, 206, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 255, 255, 0.2), 0 0 16px rgba(255, 113, 206, 0.3);
-}
+  --bg-primary: #2a211c;
+  --bg-secondary: #241c18;
+  --bg-tertiary: #332823;
+  --bg-editor: rgba(42, 33, 28, 0.88);
 
-/* ⚡ 霓虹青紫 (Neon)
-   主打暗色调下的刺眼高亮 */
-[data-theme="neon"] {
-  --bg-primary: #e6fffb; /* 极浅青 */
-  --bg-secondary: #b5f5ec;
-  --bg-tertiary: #87e8de;
-  --bg-editor: #ffffff;
-  
-  --text-primary: #002329;
-  --text-secondary: #00474f;
-  --text-tertiary: #006d75;
-  
-  --accent-primary: #722ed1; /* 霓虹亮紫 */
-  --accent-hover: #531dab;
-  --accent-subtle: rgba(114, 46, 209, 0.15);
-  
-  --border-color: rgba(114, 46, 209, 0.2);
-  --border-subtle: rgba(114, 46, 209, 0.1);
-}
+  --text-primary: #eadfcf;
+  --text-secondary: #b9a894;
+  --text-tertiary: #8f7d6d;
+  --text-inverse: #241c18;
 
-[data-theme="neon"][data-mode="dark"] {
-  --bg-primary: #0b0217; /* 极深紫 */
-  --bg-secondary: #130628;
-  --bg-tertiary: #1b0a3b;
-  --bg-editor: #070110;
-  
-  --text-primary: #00f0ff;
-  --text-secondary: #b37feb;
-  --text-tertiary: #7546c9;
-  
-  --accent-primary: #00e676; /* 霓虹绿 */
-  --accent-hover: #00f0ff;
-  --accent-subtle: rgba(0, 230, 118, 0.2);
-  
-  --border-color: rgba(0, 240, 255, 0.3);
-  --border-subtle: rgba(0, 240, 255, 0.1);
-  
-  --shadow-md: 0 0 10px rgba(0, 240, 255, 0.4), 0 0 20px rgba(0, 230, 118, 0.2);
+  --accent-primary: #93a07b;
+  --accent-hover: #b2be9b;
+  --accent-subtle: rgba(147, 160, 123, 0.14);
+
+  --border-color: #5c4b3f;
+  --border-subtle: rgba(92, 75, 63, 0.9);
+
+  --page-gradient:
+    radial-gradient(circle at top left, rgba(100, 87, 68, 0.34), transparent 28%),
+    radial-gradient(circle at top right, rgba(92, 110, 79, 0.22), transparent 22%),
+    linear-gradient(180deg, #221a17 0%, #241c18 42%, #2a211c 100%);
+  --page-texture:
+    repeating-linear-gradient(
+      0deg,
+      rgba(185, 168, 148, 0.04) 0 1px,
+      rgba(185, 168, 148, 0) 1px 12px
+    ),
+    linear-gradient(140deg, rgba(147, 160, 123, 0.08) 0%, rgba(147, 160, 123, 0) 55%);
+  --glass-surface: rgba(42, 33, 28, 0.9);
+  --glass-elevated: rgba(49, 39, 33, 0.95);
+  --glass-highlight: rgba(255, 255, 255, 0.03);
+  --shadow-color: rgba(0, 0, 0, 0.28);
+
+  --ui-primary: #eadfcf;
+  --ui-primary-hover: #f7ecdc;
+  --ui-primary-text: #241c18;
+  --ui-muted-bg: rgba(50, 40, 34, 0.96);
+  --ui-muted-bg-hover: rgba(58, 47, 40, 0.98);
+  --ui-muted-text: #d9cab8;
+  --ui-muted-border: rgba(92, 75, 63, 0.95);
 }

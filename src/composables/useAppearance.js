@@ -1,14 +1,15 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 const THEME_LABELS = {
-  default: '默认',
-  notion: '象牙暖',
-  vercel: '极简灰',
-  linear: '极光紫',
-  macaron: '马卡龙',
-  cyberpunk: '赛博朋克',
-  retro: '迈阿密',
-  neon: '霓虹青'
+  default: '默认极简',
+  fashion: '时尚风格',
+  retro: '复古风格'
+}
+
+const THEME_TOKENS = {
+  default: '极简',
+  fashion: '时尚',
+  retro: '复古'
 }
 
 export function useAppearance() {
@@ -17,6 +18,7 @@ export function useAppearance() {
   const showThemeMenu = ref(false)
 
   const themeName = computed(() => THEME_LABELS[theme.value] || '默认')
+  const themeToken = computed(() => THEME_TOKENS[theme.value] || '极简')
 
   function setColorMode(mode) {
     colorMode.value = mode
@@ -73,6 +75,7 @@ export function useAppearance() {
     colorMode,
     showThemeMenu,
     themeName,
+    themeToken,
     setColorMode,
     toggleThemeMenu,
     changeTheme

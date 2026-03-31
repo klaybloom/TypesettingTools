@@ -3,10 +3,16 @@
     <!-- 顶部导航栏 -->
     <header class="app-header">
       <div class="header-brand">
-        <svg class="logo-icon" viewBox="0 0 24 24" width="22" height="22">
-          <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/>
-        </svg>
-        <h1 class="app-title">TypeSetting</h1>
+        <div class="brand-mark">
+          <svg class="logo-icon" viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/>
+          </svg>
+          <span class="brand-kicker">WeChat Editor</span>
+        </div>
+        <div class="brand-copy">
+          <h1 class="app-title">公众号排版工具</h1>
+          <p class="brand-subtitle">面向公众号编辑的 Markdown 排版、预览与导出工作台</p>
+        </div>
       </div>
       
       <div class="header-actions">
@@ -53,36 +59,56 @@
         </div>
 
         <div class="theme-dropdown" @click.stop>
-          <button class="icon-btn" @click="toggleThemeMenu" :title="'当前风格: ' + themeName">
+          <button class="icon-btn theme-trigger" @click="toggleThemeMenu" :title="'当前风格: ' + themeName">
             <svg viewBox="0 0 24 24" width="18" height="18">
               <path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
             </svg>
+            <span class="theme-trigger-copy">
+              <span class="theme-trigger-line">
+                <span class="theme-trigger-label">{{ themeToken }}</span>
+                <span class="theme-trigger-dot">·</span>
+                <span class="theme-trigger-mode">{{ colorMode === 'dark' ? '深色' : '浅色' }}</span>
+              </span>
+            </span>
           </button>
           
           <Transition name="pop">
             <div class="theme-menu dropdown-menu" v-show="showThemeMenu">
               <div class="menu-group-title">外观模式</div>
               <button @click="setColorMode('light')" :class="{ active: colorMode === 'light' }">
-                <span class="menu-icon">☀️</span> 浅色模式
+                <span class="menu-icon">☀️</span>
+                <span class="menu-copy">
+                  <span class="menu-title">浅色模式</span>
+                </span>
               </button>
               <button @click="setColorMode('dark')" :class="{ active: colorMode === 'dark' }">
-                <span class="menu-icon">🌒</span> 深色模式
+                <span class="menu-icon">🌒</span>
+                <span class="menu-copy">
+                  <span class="menu-title">深色模式</span>
+                </span>
               </button>
               
               <div class="menu-divider"></div>
               
               <div class="menu-group-title">主题风格</div>
-              <button @click="changeTheme('default')" :class="{ active: theme === 'default' }"><span class="menu-icon">🎨</span> 默认配色</button>
-              <button @click="changeTheme('notion')" :class="{ active: theme === 'notion' }"><span class="menu-icon">📝</span> 象牙暖</button>
-              <button @click="changeTheme('vercel')" :class="{ active: theme === 'vercel' }"><span class="menu-icon">⬛</span> 极简灰</button>
-              <button @click="changeTheme('linear')" :class="{ active: theme === 'linear' }"><span class="menu-icon">🌌</span> 极光紫</button>
-              <button @click="changeTheme('macaron')" :class="{ active: theme === 'macaron' }"><span class="menu-icon">🍬</span> 马卡龙</button>
-              <div class="menu-divider"></div>
-              
-              <div class="menu-group-title">撞色 & 炫光</div>
-              <button @click="changeTheme('cyberpunk')" :class="{ active: theme === 'cyberpunk' }"><span class="menu-icon">🦿</span> 赛博朋克</button>
-              <button @click="changeTheme('retro')" :class="{ active: theme === 'retro' }"><span class="menu-icon">📼</span> 迈阿密复古</button>
-              <button @click="changeTheme('neon')" :class="{ active: theme === 'neon' }"><span class="menu-icon">⚡</span> 霓虹青紫</button>
+              <button @click="changeTheme('default')" :class="{ active: theme === 'default' }">
+                <span class="menu-icon">◻︎</span>
+                <span class="menu-copy">
+                  <span class="menu-title">默认极简</span>
+                </span>
+              </button>
+              <button @click="changeTheme('fashion')" :class="{ active: theme === 'fashion' }">
+                <span class="menu-icon">✦</span>
+                <span class="menu-copy">
+                  <span class="menu-title">时尚风格</span>
+                </span>
+              </button>
+              <button @click="changeTheme('retro')" :class="{ active: theme === 'retro' }">
+                <span class="menu-icon">◼︎</span>
+                <span class="menu-copy">
+                  <span class="menu-title">复古风格</span>
+                </span>
+              </button>
             </div>
           </Transition>
         </div>
@@ -167,7 +193,7 @@ const copySuccess = ref(false)
 const scrollRatio = ref(0)
 const exportSurfaceRef = ref(null)
 
-const { theme, colorMode, showThemeMenu, themeName, setColorMode, toggleThemeMenu, changeTheme } = useAppearance()
+const { theme, colorMode, showThemeMenu, themeName, themeToken, setColorMode, toggleThemeMenu, changeTheme } = useAppearance()
 const { copyHtmlToClipboard } = useClipboardHtml()
 const { isExporting, exportElementAsImage } = useImageExport()
 const { toast, showToast } = useToast()
@@ -219,36 +245,72 @@ async function exportImage() {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
+  background: var(--page-texture), var(--page-gradient);
+  transition: background var(--transition-normal), color var(--transition-normal);
 }
 
 .app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
-  background: transparent;
-  border-bottom: 1px solid var(--border-subtle);
+  margin: 10px 10px 0;
+  padding: 18px 28px;
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-highlight);
+  border-radius: 30px;
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow:
+    0 18px 40px var(--shadow-color),
+    inset 0 1px 0 var(--glass-highlight);
+  transition:
+    background var(--transition-normal),
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal),
+    color var(--transition-normal);
 }
 
 .app-header::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--bg-primary);
-  opacity: 0.85;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--glass-highlight), rgba(255,255,255,0));
+  opacity: 1;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   z-index: -1;
 }
 
 .header-brand {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.brand-mark {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
+  padding: 2px 0;
+  color: var(--text-secondary);
+}
+
+.brand-kicker {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
 }
 
 .logo-icon {
@@ -256,15 +318,27 @@ async function exportImage() {
 }
 
 .app-title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Noto Serif SC", Georgia, serif;
+  font-size: 2.15rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   color: var(--text-primary);
+}
+
+.brand-subtitle {
+  font-size: 0.94rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  transform: translateY(2px);
 }
 
 .header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  align-self: stretch;
 }
 
 /* 统计信息显示 */
@@ -272,11 +346,18 @@ async function exportImage() {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 10px 14px;
   font-size: 12px;
-  color: var(--text-tertiary);
-  background: var(--bg-tertiary);
-  border-radius: 6px;
+  color: var(--text-secondary);
+  background: var(--ui-muted-bg);
+  border: 1px solid var(--ui-muted-border);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+  transition:
+    background var(--transition-normal),
+    border-color var(--transition-normal),
+    color var(--transition-normal),
+    box-shadow var(--transition-normal);
 }
 
 .stat-item {
@@ -292,17 +373,20 @@ async function exportImage() {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 10px 18px;
+  border-radius: 999px;
   font-size: 13px;
-  font-weight: 500;
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-  transition: all 0.15s;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  background: var(--ui-muted-bg);
+  color: var(--ui-muted-text);
+  border: 1px solid var(--ui-muted-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
 }
 
 .action-btn:hover:not(:disabled) {
-  background: var(--bg-tertiary);
+  background: var(--ui-muted-bg-hover);
   color: var(--text-primary);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
@@ -313,17 +397,21 @@ async function exportImage() {
 }
 
 .action-btn.active {
-  background: var(--text-primary);
-  color: var(--bg-primary);
+  background: var(--ui-primary);
+  color: var(--ui-primary-text);
+  border-color: var(--ui-primary);
 }
 
 .action-btn.primary {
-  background: var(--text-primary);
-  color: var(--bg-primary);
+  background: var(--ui-primary);
+  color: var(--ui-primary-text);
+  border-color: var(--ui-primary);
+  box-shadow: var(--shadow-md);
 }
 
 .action-btn.primary:hover:not(:disabled) {
-  opacity: 0.85;
+  background: var(--ui-primary-hover);
+  opacity: 1;
 }
 
 .action-btn:disabled {
@@ -335,15 +423,17 @@ async function exportImage() {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  color: var(--text-tertiary);
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: var(--ui-muted-bg);
+  border: 1px solid var(--ui-muted-border);
   transition: all 0.15s;
 }
 
 .icon-btn:hover {
-  background: var(--bg-tertiary);
+  background: var(--ui-muted-bg-hover);
   color: var(--text-primary);
   transform: translateY(-1px);
 }
@@ -352,14 +442,51 @@ async function exportImage() {
   transform: scale(0.92);
 }
 
+.theme-trigger {
+  width: auto;
+  min-width: 42px;
+  padding: 0 12px;
+  gap: 8px;
+}
+
+.theme-trigger-copy {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+
+.theme-trigger-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.theme-trigger-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.theme-trigger-mode {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.theme-trigger-dot {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
 /* 主内容区 */
 .app-main {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  padding: 5px;
-  background: var(--bg-secondary);
+  padding: 10px;
+  background: transparent;
   overflow: hidden;
 }
 
@@ -367,26 +494,40 @@ async function exportImage() {
 .preview-section {
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-sm);
+  background: var(--glass-surface);
+  border-radius: 30px;
+  border: 1px solid var(--glass-highlight);
+  box-shadow:
+    0 20px 44px var(--shadow-color),
+    inset 0 1px 0 var(--glass-highlight);
   overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition:
+    background var(--transition-normal),
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal);
 }
 
 .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 14px 18px;
+  min-height: 60px;
   border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-primary);
+  background: rgba(255, 255, 255, 0.14);
+  transition:
+    background var(--transition-normal),
+    border-color var(--transition-normal),
+    color var(--transition-normal);
 }
 
 .section-title {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--text-tertiary);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
 }
 
 .char-count {
@@ -396,20 +537,24 @@ async function exportImage() {
 
 .preview-controls {
   display: flex;
-  gap: 2px;
+  gap: 6px;
 }
 
 .mode-btn {
-  padding: 3px 8px;
-  font-size: 11px;
-  color: var(--text-tertiary);
-  border-radius: 4px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--ui-muted-bg);
+  border: 1px solid var(--ui-muted-border);
+  border-radius: 999px;
   transition: all 0.15s;
 }
 
 .mode-btn.active {
-  background: var(--text-primary);
-  color: var(--bg-primary);
+  background: var(--ui-primary);
+  color: var(--ui-primary-text);
+  border-color: var(--ui-primary);
 }
 
 /* Toast 提示 */
@@ -418,12 +563,13 @@ async function exportImage() {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 8px 16px;
-  background: var(--text-primary);
-  color: var(--bg-primary);
-  border-radius: 6px;
+  padding: 12px 18px;
+  background: var(--ui-primary);
+  color: var(--ui-primary-text);
+  border-radius: 999px;
   font-size: 13px;
   z-index: 1000;
+  box-shadow: 0 16px 40px rgba(27, 35, 48, 0.2);
 }
 
 .toast.error {
@@ -451,16 +597,18 @@ async function exportImage() {
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: 6px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
+  margin-top: 10px;
+  background: var(--glass-elevated);
+  border: 1px solid var(--ui-muted-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
   z-index: 200;
   min-width: 160px;
-  padding: 6px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .theme-dropdown .dropdown-menu button {
@@ -468,44 +616,58 @@ async function exportImage() {
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 6px 10px;
+  padding: 10px 12px;
   text-align: left;
   font-size: 13px;
   color: var(--text-primary);
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: 14px;
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .theme-dropdown .dropdown-menu button:hover {
-  background: var(--bg-tertiary);
-  color: var(--accent-primary);
+  background: var(--ui-muted-bg);
+  color: var(--text-primary);
 }
 
 .theme-dropdown .dropdown-menu button.active {
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
-  font-weight: 500;
+  background: var(--ui-primary);
+  color: var(--ui-primary-text);
+  font-weight: 700;
 }
 
 .menu-icon {
   width: 20px;
+  flex: 0 0 20px;
   text-align: center;
+}
+
+.menu-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.menu-title {
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .menu-group-title {
   font-size: 11px;
   color: var(--text-tertiary);
-  padding: 2px 8px;
+  padding: 6px 10px 4px;
   margin-top: 1px;
+  letter-spacing: 0.08em;
 }
 
 .menu-divider {
   height: 1px;
-  background: var(--border-color);
-  margin: 2px 0;
+  background: rgba(226, 233, 241, 0.95);
+  margin: 6px 0;
 }
 
 .pop-enter-active,
@@ -533,6 +695,48 @@ async function exportImage() {
   .app-main {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 1fr;
+  }
+
+  .app-header {
+    padding: 16px 20px;
+  }
+
+  .app-title {
+    font-size: 1.72rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-header {
+    margin: 8px 8px 0;
+    padding: 14px 16px;
+    border-radius: 24px;
+  }
+
+  .header-actions {
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .app-main {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .brand-copy {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .editor-section,
+  .preview-section {
+    border-radius: 24px;
   }
 }
 </style>
