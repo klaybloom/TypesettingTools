@@ -1,4 +1,4 @@
-# 📝 微信公众号排版工具
+# mdpress · 微信公众号 Markdown 排版器
 
 一款基于 Vue 3 + Vite 构建的微信公众号文章排版工具，支持 Markdown 编写、实时预览、一键复制和导出图片，让公众号排版更高效、更美观。
 
@@ -71,24 +71,30 @@ npm run preview
 ## 📁 项目结构
 
 ```
-TypesettingTools/
-├── src/
-│   ├── App.vue              # 主应用组件
-│   ├── main.js              # 应用入口
-│   ├── components/
-│   │   ├── Editor.vue       # Markdown 编辑器组件
-│   │   ├── Preview.vue      # 实时预览组件
-│   │   └── StylePanel.vue   # 样式设置面板
-│   ├── styles/
-│   │   ├── base.css         # 基础样式
-│   │   └── variables.css    # CSS 变量定义
-│   └── utils/
-│       ├── config.js        # 主题与配置管理
-│       ├── formatter.js     # Markdown 格式化与样式内联
-│       └── punctuation.js   # 中文标点处理
-├── index.html               # HTML 入口
-├── vite.config.js           # Vite 配置
-└── package.json             # 项目配置
+src/
+├── App.vue                       # 主应用容器
+├── main.js                       # 应用入口
+├── components/
+│   ├── Editor.vue                # Markdown 编辑器
+│   ├── ExportSurface.vue         # 离屏导出画布
+│   ├── Preview.vue               # 桌面 / 手机预览
+│   └── StylePanel.vue            # 排版设置面板
+├── composables/
+│   ├── useAppearance.js          # 深浅模式
+│   ├── useClipboardHtml.js       # HTML 富文本复制
+│   ├── useHistory.js             # 撤销 / 重做历史
+│   ├── useImageExport.js         # 长图导出
+│   ├── usePersistentStyleSettings.js  # 排版设置持久化
+│   ├── useRenderedDocument.js    # Markdown → 排版后 HTML
+│   └── useToast.js               # 全局轻提示
+├── styles/
+│   ├── base.css                  # 基础重置
+│   └── variables.css             # 主题 CSS 变量
+└── utils/
+    ├── articleStyle.js           # 文章内联样式表
+    ├── config.js                 # 默认排版与预设
+    ├── formatter.js              # markdown-it 渲染管线
+    └── punctuation.js            # 中文标点规范化
 ```
 
 ## 📄 License
