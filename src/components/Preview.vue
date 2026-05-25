@@ -15,29 +15,43 @@
               <span></span><span></span><span></span>
             </div>
           </div>
-          <div 
+          <div
             ref="previewContentRef"
             class="preview-content"
             @scroll="handleScroll"
-            v-html="content || emptyState"
-          ></div>
+          >
+            <div v-if="!content" class="empty-preview">
+              <svg viewBox="0 0 24 24" width="48" height="48">
+                <path fill="currentColor" opacity="0.3" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/>
+              </svg>
+              <p>在左侧输入 Markdown 即可实时预览</p>
+            </div>
+            <div v-else v-html="content"></div>
+          </div>
         </div>
       </div>
     </div>
-    
+
     <div v-else class="preview-desktop">
-      <div 
+      <div
         ref="previewContentRef"
         class="preview-content"
         @scroll="handleScroll"
-        v-html="content || emptyState"
-      ></div>
+      >
+        <div v-if="!content" class="empty-preview">
+          <svg viewBox="0 0 24 24" width="48" height="48">
+            <path fill="currentColor" opacity="0.3" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/>
+          </svg>
+          <p>在左侧输入 Markdown 即可实时预览</p>
+        </div>
+        <div v-else v-html="content"></div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps({
   content: {
@@ -81,15 +95,6 @@ function handleScroll(e) {
   const ratio = maxScroll > 0 ? el.scrollTop / maxScroll : 0
   emit('scroll', ratio)
 }
-
-const emptyState = computed(() => `
-  <div class="empty-preview">
-    <svg viewBox="0 0 24 24" width="48" height="48">
-      <path fill="currentColor" opacity="0.3" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/>
-    </svg>
-    <p>在左侧输入 Markdown 即可实时预览</p>
-  </div>
-`)
 </script>
 
 <style scoped>

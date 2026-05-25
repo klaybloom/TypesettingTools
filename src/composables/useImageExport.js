@@ -33,7 +33,10 @@ export function useImageExport() {
       const link = document.createElement('a')
       link.download = `${fileNamePrefix}-${Date.now()}.png`
       link.href = canvas.toDataURL('image/png')
+      // Firefox 要求 link 在 document 树内才能触发下载
+      document.body.appendChild(link)
       link.click()
+      link.remove()
 
       return {
         ok: true,

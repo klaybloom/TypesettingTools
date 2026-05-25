@@ -169,9 +169,7 @@ function applyPreset(preset) {
 }
 
 function isPresetActive(preset) {
-  const s = props.settings
-  const p = preset.settings
-  return s.accentColor === p.accentColor && s.textColor === p.textColor && s.fontSize === p.fontSize && s.textIndent === p.textIndent
+  return Object.keys(preset.settings).every((key) => props.settings[key] === preset.settings[key])
 }
 
 function resetSettings() {

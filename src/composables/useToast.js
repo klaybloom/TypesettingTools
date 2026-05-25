@@ -8,7 +8,7 @@ export function useToast() {
     clearTimeout(hideTimer)
     toast.value = { show: true, message, type }
     hideTimer = setTimeout(() => {
-      toast.value.show = false
+      toast.value = { show: false, message: '', type }
     }, 2500)
   }
 

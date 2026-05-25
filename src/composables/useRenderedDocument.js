@@ -1,5 +1,5 @@
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { formatText, inlineStyles } from '../utils/formatter.js'
+import { formatText } from '../utils/formatter.js'
 
 const DEFAULT_MARKDOWN_SAMPLE = `# Markdown 语法示例
 
@@ -51,7 +51,8 @@ console.log(greet('WeChat Editor'))
 
 export function useRenderedDocument(articleStyleSettings) {
   const rawContent = ref(DEFAULT_MARKDOWN_SAMPLE)
-  const debouncedContent = ref('')
+  // 首屏直接同步赋值，避免被 debounce 拖出 300ms 空白
+  const debouncedContent = ref(rawContent.value)
   const debouncedSettings = ref({ ...articleStyleSettings.value })
 
   let contentDebounceTimer = null
@@ -62,18 +63,18 @@ export function useRenderedDocument(articleStyleSettings) {
     contentDebounceTimer = setTimeout(() => {
       debouncedContent.value = newVal
     }, 300)
-  }, { immediate: true })
+  })
 
   watch(articleStyleSettings, (newVal) => {
     clearTimeout(settingsDebounceTimer)
     settingsDebounceTimer = setTimeout(() => {
       debouncedSettings.value = { ...newVal }
     }, 150)
-  }, { deep: true, immediate: true })
+  }, { deep: true })
 
   const formattedContent = computed(() => {
     if (!debouncedContent.value.trim()) return ''
-    return inlineStyles(formatText(debouncedContent.value, debouncedSettings.value))
+    return formatText(debouncedContent.value, debouncedSettings.value)
   })
 
   const charCount = computed(() => rawContent.value.replace(/\s/g, '').length)

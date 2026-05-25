@@ -21,7 +21,8 @@ describe('useRenderedDocument', () => {
 
     expect(result.charCount.value).toBe(4)
     expect(result.readingTime.value).toBe(1)
-    expect(result.formattedContent.value).toBe('')
+    // 首屏立即出内容，后续变更仍走 debounce
+    expect(result.formattedContent.value).toContain('Markdown 语法示例')
 
     vi.advanceTimersByTime(300)
     await nextTick()
@@ -57,16 +58,12 @@ describe('useRenderedDocument', () => {
     await unmount()
   })
 
-  it('renders the default markdown sample after debounce', async () => {
+  it('renders the default markdown sample immediately on first paint', async () => {
     vi.useFakeTimers()
     const articleStyleSettings = ref({ ...defaultArticleStyleSettings })
     const { result, unmount } = await mountComposable(() => useRenderedDocument(articleStyleSettings))
 
-    expect(result.formattedContent.value).toBe('')
-
-    vi.advanceTimersByTime(300)
-    await nextTick()
-
+    // 首屏不再等 debounce
     expect(result.formattedContent.value).toContain('Markdown 语法示例')
     expect(result.formattedContent.value).toContain('<table')
     expect(result.formattedContent.value).toContain('<pre')

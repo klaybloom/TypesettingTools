@@ -2,7 +2,7 @@
  * 撤销/重做历史管理 Composable
  * 用于编辑器内容的历史记录管理
  */
-import { ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 export function useHistory(initialValue = '', options = {}) {
   const {
@@ -20,17 +20,14 @@ export function useHistory(initialValue = '', options = {}) {
   function pushHistory(value) {
     clearTimeout(debounceTimer)
     debounceTimer = setTimeout(() => {
-      // 如果当前不在历史记录末尾，删除后面的记录
+      // 与当前 head 重复 → 直接丢弃，保留已有 redo 栈
+      if (history.value[currentIndex.value] === value) return
+
+      // 截断 future（注意：必须在 dedup 之后，否则会无谓清掉 redo 栈）
       if (currentIndex.value < history.value.length - 1) {
         history.value = history.value.slice(0, currentIndex.value + 1)
       }
 
-      // 避免重复记录相同内容
-      if (history.value[currentIndex.value] === value) {
-        return
-      }
-
-      // 添加新记录
       history.value.push(value)
       currentIndex.value++
 
@@ -42,55 +39,30 @@ export function useHistory(initialValue = '', options = {}) {
     }, debounceTime)
   }
 
-  /**
-   * 撤销
-   */
   function undo() {
-    if (canUndo.value) {
-      currentIndex.value--
-      return history.value[currentIndex.value]
-    }
-    return null
+    if (!canUndo.value) return null
+    // 撤销前如果还有待提交的 push，要先放弃，避免回写时被记录
+    clearTimeout(debounceTimer)
+    currentIndex.value--
+    return history.value[currentIndex.value]
   }
 
-  /**
-   * 重做
-   */
   function redo() {
-    if (canRedo.value) {
-      currentIndex.value++
-      return history.value[currentIndex.value]
-    }
-    return null
+    if (!canRedo.value) return null
+    clearTimeout(debounceTimer)
+    currentIndex.value++
+    return history.value[currentIndex.value]
   }
 
-  /**
-   * 是否可以撤销
-   */
-  const canUndo = ref(false)
-  watch(currentIndex, (val) => {
-    canUndo.value = val > 0
-  }, { immediate: true })
+  const canUndo = computed(() => currentIndex.value > 0)
+  const canRedo = computed(() => currentIndex.value < history.value.length - 1)
 
-  /**
-   * 是否可以重做
-   */
-  const canRedo = ref(false)
-  watch([currentIndex, history], ([idx, hist]) => {
-    canRedo.value = idx < hist.length - 1
-  }, { immediate: true, deep: true })
-
-  /**
-   * 清空历史记录
-   */
   function clear() {
+    clearTimeout(debounceTimer)
     history.value = [initialValue]
     currentIndex.value = 0
   }
 
-  /**
-   * 获取当前值
-   */
   function getCurrentValue() {
     return history.value[currentIndex.value]
   }

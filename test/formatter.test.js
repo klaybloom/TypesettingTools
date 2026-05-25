@@ -2,7 +2,7 @@
  * formatter.js 单元测试
  */
 import { describe, it, expect } from 'vitest'
-import { formatText, inlineStyles } from '../src/utils/formatter.js'
+import { formatText } from '../src/utils/formatter.js'
 import { defaultArticleStyleSettings } from '../src/utils/config.js'
 
 describe('formatter.js', () => {
@@ -151,15 +151,6 @@ describe('formatter.js', () => {
 
       expect(result).toContain('未完成任务')
       expect(result).toContain('已完成任务')
-    })
-  })
-
-  describe('inlineStyles', () => {
-    it('应该直接返回HTML内容', () => {
-      const html = '<p>测试内容</p>'
-      const result = inlineStyles(html)
-
-      expect(result).toBe(html)
     })
   })
 })

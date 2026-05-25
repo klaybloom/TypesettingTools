@@ -20,20 +20,6 @@
         </Transition>
       </div>
 
-      <!-- 待办下拉
-      <div class="toolbar-dropdown">
-        <button class="toolbar-btn with-arrow" @click="toggleTodoMenu" title="待办">
-          <span class="btn-text">☑</span>
-          <svg class="arrow-icon" viewBox="0 0 24 24" width="12" height="12">
-            <path fill="currentColor" d="M7 10l5 5 5-5z"/>
-          </svg>
-        </button>
-        <div class="dropdown-menu" v-show="showTodoMenu">
-          <button @click="insertFormat('todo')"><span class="menu-icon">☐</span> 未完成</button>
-          <button @click="insertFormat('todoDone')"><span class="menu-icon">☑</span> 已完成</button>
-        </div>
-      </div> -->
-
       <div class="toolbar-divider"></div>
 
       <!-- 主要按钮 (平铺) -->
@@ -119,6 +105,8 @@
         @paste="handlePaste"
         @scroll="handleScroll"
         @click="closeMenus"
+        @compositionstart="onCompositionStart"
+        @compositionend="onCompositionEnd"
         spellcheck="false"
       ></textarea>
     </div>
@@ -140,36 +128,46 @@ const emit = defineEmits(['update:modelValue', 'scroll'])
 const textareaRef = ref(null)
 const imageInputRef = ref(null)
 const showHeadingMenu = ref(false)
-const showTodoMenu = ref(false)
 const syncingFromExternal = ref(false)
+// IME composition 期间不要 emit / 不要 push history，避免半字进入历史
+const isComposing = ref(false)
+// undo / redo 触发的 modelValue 变更不应再次写回历史
+let suppressNextHistoryPush = false
 
 // 历史记录管理
-const { pushHistory, undo, redo, canUndo, canRedo } = useHistory(props.modelValue, {
+const { pushHistory, undo, redo } = useHistory(props.modelValue, {
   maxHistory: 100,
   debounceTime: 500
 })
 
-// 监听外部内容变化，推入历史记录
 watch(() => props.modelValue, (newVal) => {
+  if (suppressNextHistoryPush) {
+    suppressNextHistoryPush = false
+    return
+  }
+  if (isComposing.value) return
   pushHistory(newVal)
 })
 
 function toggleHeadingMenu() {
   showHeadingMenu.value = !showHeadingMenu.value
-  showTodoMenu.value = false
-}
-
-function toggleTodoMenu() {
-  showTodoMenu.value = !showTodoMenu.value
-  showHeadingMenu.value = false
 }
 
 function closeMenus() {
   showHeadingMenu.value = false
-  showTodoMenu.value = false
 }
 
 function handleInput(e) {
+  if (isComposing.value) return
+  emit('update:modelValue', e.target.value)
+}
+
+function onCompositionStart() {
+  isComposing.value = true
+}
+
+function onCompositionEnd(e) {
+  isComposing.value = false
   emit('update:modelValue', e.target.value)
 }
 
@@ -196,52 +194,61 @@ watch(() => props.scrollRatio, (ratio) => {
   })
 })
 
+function applyHistoryValue(value) {
+  suppressNextHistoryPush = true
+  emit('update:modelValue', value)
+}
+
 function handleKeydown(e) {
   const mod = e.ctrlKey || e.metaKey
+  // 按下 Shift 时 e.key 会是大写字母，统一比小写更省事
+  const key = e.key.length === 1 ? e.key.toLowerCase() : e.key
 
-  // 撤销/重做
-  if (mod && !e.shiftKey && e.key === 'z') {
+  // 撤销 / 重做（Cmd/Ctrl+Z = undo；Cmd/Ctrl+Shift+Z 或 Cmd/Ctrl+Y = redo）
+  if (mod && !e.shiftKey && key === 'z') {
     e.preventDefault()
-    const prevValue = undo()
-    if (prevValue !== null) {
-      emit('update:modelValue', prevValue)
-    }
+    const prev = undo()
+    if (prev !== null) applyHistoryValue(prev)
     return
   }
-  if (mod && (e.shiftKey && e.key === 'z' || e.key === 'y')) {
+  if (mod && ((e.shiftKey && key === 'z') || key === 'y')) {
     e.preventDefault()
-    const nextValue = redo()
-    if (nextValue !== null) {
-      emit('update:modelValue', nextValue)
-    }
+    const next = redo()
+    if (next !== null) applyHistoryValue(next)
     return
   }
 
-  if (e.key === 'Tab') {
+  if (key === 'Tab') {
     e.preventDefault()
     insertAtCursor('    ')
+    return
   }
-  if (mod && !e.shiftKey && e.key === 'b') {
+  if (mod && !e.shiftKey && key === 'b') {
     e.preventDefault()
     insertFormat('bold')
+    return
   }
-  if (mod && !e.shiftKey && e.key === 'i') {
+  if (mod && !e.shiftKey && key === 'i') {
     e.preventDefault()
     insertFormat('italic')
+    return
   }
-  if (mod && e.shiftKey && e.key === 'X') {
+  if (mod && e.shiftKey && key === 'x') {
     e.preventDefault()
     insertFormat('strikethrough')
+    return
   }
-  if (mod && e.shiftKey && e.key === 'K') {
+  if (mod && e.shiftKey && key === 'k') {
     e.preventDefault()
     insertFormat('codeblock')
+    return
   }
-  if (mod && e.shiftKey && e.key === 'Q') {
+  if (mod && e.shiftKey && key === 'q') {
     e.preventDefault()
     insertFormat('quote')
+    return
   }
-  if (mod && !e.shiftKey && e.key === 'l') {
+  if (mod && !e.shiftKey && key === 'l') {
     e.preventDefault()
     insertFormat('link')
   }
