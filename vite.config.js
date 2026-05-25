@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
+    // 用相对路径，便于在 GitHub Pages 子路径 / 自定义域名 / 本地 file:// 下都能正确加载资源
+    base: './',
     plugins: [vue()],
     server: {
         port: 5173,
