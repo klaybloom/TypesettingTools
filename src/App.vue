@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container" :data-theme="theme" :data-mode="colorMode">
+  <div class="app-container" :data-mode="colorMode">
     <!-- 顶部导航栏 -->
     <header class="app-header">
       <div class="header-brand">
@@ -58,60 +58,19 @@
           <span class="stat-item">{{ readingTime }} 分钟</span>
         </div>
 
-        <div class="theme-dropdown" @click.stop>
-          <button class="icon-btn theme-trigger" @click="toggleThemeMenu" :title="'当前风格: ' + themeName">
-            <svg viewBox="0 0 24 24" width="18" height="18">
-              <path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
-            </svg>
-            <span class="theme-trigger-copy">
-              <span class="theme-trigger-line">
-                <span class="theme-trigger-label">{{ themeToken }}</span>
-                <span class="theme-trigger-dot">·</span>
-                <span class="theme-trigger-mode">{{ colorMode === 'dark' ? '深色' : '浅色' }}</span>
-              </span>
-            </span>
-          </button>
-          
-          <Transition name="pop">
-            <div class="theme-menu dropdown-menu" v-show="showThemeMenu">
-              <div class="menu-group-title">外观模式</div>
-              <button @click="setColorMode('light')" :class="{ active: colorMode === 'light' }">
-                <span class="menu-icon">☀️</span>
-                <span class="menu-copy">
-                  <span class="menu-title">浅色模式</span>
-                </span>
-              </button>
-              <button @click="setColorMode('dark')" :class="{ active: colorMode === 'dark' }">
-                <span class="menu-icon">🌒</span>
-                <span class="menu-copy">
-                  <span class="menu-title">深色模式</span>
-                </span>
-              </button>
-              
-              <div class="menu-divider"></div>
-              
-              <div class="menu-group-title">主题风格</div>
-              <button @click="changeTheme('default')" :class="{ active: theme === 'default' }">
-                <span class="menu-icon">◻︎</span>
-                <span class="menu-copy">
-                  <span class="menu-title">默认极简</span>
-                </span>
-              </button>
-              <button @click="changeTheme('fashion')" :class="{ active: theme === 'fashion' }">
-                <span class="menu-icon">✦</span>
-                <span class="menu-copy">
-                  <span class="menu-title">时尚风格</span>
-                </span>
-              </button>
-              <button @click="changeTheme('retro')" :class="{ active: theme === 'retro' }">
-                <span class="menu-icon">◼︎</span>
-                <span class="menu-copy">
-                  <span class="menu-title">复古风格</span>
-                </span>
-              </button>
-            </div>
-          </Transition>
-        </div>
+        <button
+          class="icon-btn mode-toggle"
+          @click="toggleColorMode"
+          :title="colorMode === 'dark' ? '切换到浅色模式' : '切换到深色模式'"
+          :aria-label="colorMode === 'dark' ? '切换到浅色模式' : '切换到深色模式'"
+        >
+          <svg v-if="colorMode === 'dark'" viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm0 18a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1zM4.22 4.22a1 1 0 011.42 0l1.41 1.41a1 1 0 11-1.41 1.42L4.22 5.64a1 1 0 010-1.42zm12.73 12.73a1 1 0 011.42 0l1.41 1.41a1 1 0 01-1.41 1.42l-1.42-1.41a1 1 0 010-1.42zM2 12a1 1 0 011-1h2a1 1 0 110 2H3a1 1 0 01-1-1zm17 0a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zM4.22 19.78a1 1 0 010-1.42l1.41-1.41a1 1 0 111.42 1.41l-1.42 1.42a1 1 0 01-1.41 0zm12.73-12.73a1 1 0 010-1.42l1.41-1.41a1 1 0 111.42 1.41l-1.42 1.42a1 1 0 01-1.41 0z"/>
+          </svg>
+          <svg v-else viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
       </div>
     </header>
 
@@ -193,7 +152,7 @@ const copySuccess = ref(false)
 const scrollRatio = ref(0)
 const exportSurfaceRef = ref(null)
 
-const { theme, colorMode, showThemeMenu, themeName, themeToken, setColorMode, toggleThemeMenu, changeTheme } = useAppearance()
+const { colorMode, toggleColorMode } = useAppearance()
 const { copyHtmlToClipboard } = useClipboardHtml()
 const { isExporting, exportElementAsImage } = useImageExport()
 const { toast, showToast } = useToast()
@@ -213,8 +172,6 @@ async function copyHtml() {
 
   showToast('复制失败，请手动复制', 'error')
 }
-
-// （已移除点击空白处关闭样式面板逻辑，改为常驻推挤排版）
 
 // 编辑器滚动同步
 function onEditorScroll(ratio) {
@@ -442,43 +399,6 @@ async function exportImage() {
   transform: scale(0.92);
 }
 
-.theme-trigger {
-  width: auto;
-  min-width: 42px;
-  padding: 0 12px;
-  gap: 8px;
-}
-
-.theme-trigger-copy {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  line-height: 1.1;
-}
-
-.theme-trigger-line {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-
-.theme-trigger-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.theme-trigger-mode {
-  font-size: 10px;
-  color: var(--text-tertiary);
-}
-
-.theme-trigger-dot {
-  font-size: 10px;
-  color: var(--text-tertiary);
-}
-
 /* 主内容区 */
 .app-main {
   flex: 1;
@@ -528,11 +448,6 @@ async function exportImage() {
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--text-secondary);
-}
-
-.char-count {
-  font-size: 11px;
-  color: var(--text-tertiary);
 }
 
 .preview-controls {
@@ -586,99 +501,6 @@ async function exportImage() {
 .toast-leave-to {
   opacity: 0;
   transform: translateX(-50%) translateY(10px);
-}
-
-/* 主题下拉菜单相关 */
-.theme-dropdown {
-  position: relative;
-}
-
-.theme-dropdown .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 10px;
-  background: var(--glass-elevated);
-  border: 1px solid var(--ui-muted-border);
-  border-radius: 20px;
-  box-shadow: var(--shadow-lg);
-  z-index: 200;
-  min-width: 160px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-
-.theme-dropdown .dropdown-menu button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 10px 12px;
-  text-align: left;
-  font-size: 13px;
-  color: var(--text-primary);
-  background: transparent;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-
-.theme-dropdown .dropdown-menu button:hover {
-  background: var(--ui-muted-bg);
-  color: var(--text-primary);
-}
-
-.theme-dropdown .dropdown-menu button.active {
-  background: var(--ui-primary);
-  color: var(--ui-primary-text);
-  font-weight: 700;
-}
-
-.menu-icon {
-  width: 20px;
-  flex: 0 0 20px;
-  text-align: center;
-}
-
-.menu-copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 0;
-}
-
-.menu-title {
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.menu-group-title {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  padding: 6px 10px 4px;
-  margin-top: 1px;
-  letter-spacing: 0.08em;
-}
-
-.menu-divider {
-  height: 1px;
-  background: rgba(226, 233, 241, 0.95);
-  margin: 6px 0;
-}
-
-.pop-enter-active,
-.pop-leave-active {
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
-  transform-origin: top right;
-}
-.pop-enter-from,
-.pop-leave-to {
-  opacity: 0;
-  transform: scale(0.95);
 }
 
 /* 加载动画 */

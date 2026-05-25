@@ -13,44 +13,59 @@ describe('useAppearance', () => {
     localStorage.clear()
   })
 
-  it('restores theme and color mode from storage', async () => {
-    localStorage.setItem('theme', 'fashion')
+  it('从 storage 恢复 colorMode', async () => {
     localStorage.setItem('colorMode', 'dark')
 
     const { result, unmount } = await mountComposable(() => useAppearance())
 
-    expect(result.theme.value).toBe('fashion')
     expect(result.colorMode.value).toBe('dark')
-    expect(result.themeName.value).toBe('时尚风格')
 
     await unmount()
   })
 
-  it('keeps legacy dark theme compatibility when color mode is absent', async () => {
+  it('兼容旧版本把 dark 写在 theme key 的情况', async () => {
     localStorage.setItem('theme', 'dark')
 
     const { result, unmount } = await mountComposable(() => useAppearance())
 
-    expect(result.theme.value).toBe('default')
     expect(result.colorMode.value).toBe('dark')
 
     await unmount()
   })
 
-  it('persists updates made through appearance actions', async () => {
+  it('未持久化时跟随系统偏好', async () => {
+    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }))
+
     const { result, unmount } = await mountComposable(() => useAppearance())
 
-    result.toggleThemeMenu()
-    expect(result.showThemeMenu.value).toBe(true)
-
-    result.changeTheme('retro')
-    result.setColorMode('dark')
-
-    expect(result.theme.value).toBe('retro')
-    expect(result.showThemeMenu.value).toBe(false)
     expect(result.colorMode.value).toBe('dark')
-    expect(localStorage.getItem('theme')).toBe('retro')
+
+    await unmount()
+  })
+
+  it('setColorMode 持久化并校验白名单', async () => {
+    const { result, unmount } = await mountComposable(() => useAppearance())
+
+    result.setColorMode('dark')
+    expect(result.colorMode.value).toBe('dark')
     expect(localStorage.getItem('colorMode')).toBe('dark')
+
+    // 非法值被忽略
+    result.setColorMode('weird')
+    expect(result.colorMode.value).toBe('dark')
+
+    await unmount()
+  })
+
+  it('toggleColorMode 在 light / dark 之间切换', async () => {
+    const { result, unmount } = await mountComposable(() => useAppearance())
+
+    expect(result.colorMode.value).toBe('light')
+    result.toggleColorMode()
+    expect(result.colorMode.value).toBe('dark')
+    expect(localStorage.getItem('colorMode')).toBe('dark')
+    result.toggleColorMode()
+    expect(result.colorMode.value).toBe('light')
 
     await unmount()
   })
