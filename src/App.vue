@@ -3,16 +3,10 @@
     <!-- 顶部导航栏 -->
     <header class="app-header">
       <div class="header-brand">
-        <div class="brand-mark">
-          <svg class="logo-icon" viewBox="0 0 24 24" width="18" height="18">
-            <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/>
-          </svg>
-          <span class="brand-kicker">WeChat Editor</span>
-        </div>
-        <div class="brand-copy">
-          <h1 class="app-title">公众号排版工具</h1>
-          <p class="brand-subtitle">面向公众号编辑的 Markdown 排版、预览与导出工作台</p>
-        </div>
+        <svg class="logo-icon" viewBox="0 0 24 24" width="22" height="22">
+          <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/>
+        </svg>
+        <h1 class="app-title">mdpress</h1>
       </div>
       
       <div class="header-actions">
@@ -211,10 +205,10 @@ async function exportImage() {
   align-items: center;
   justify-content: space-between;
   margin: 10px 10px 0;
-  padding: 18px 28px;
+  padding: 10px 24px;
   background: var(--glass-surface);
   border: 1px solid var(--glass-highlight);
-  border-radius: 30px;
+  border-radius: 24px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -242,53 +236,23 @@ async function exportImage() {
 
 .header-brand {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  min-width: 0;
-}
-
-.brand-mark {
-  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 2px 0;
-  color: var(--text-secondary);
-}
-
-.brand-kicker {
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-}
-
-.brand-copy {
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  gap: 18px;
-  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
 }
 
 .logo-icon {
   color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 .app-title {
   font-family: "Iowan Old Style", "Palatino Linotype", "Noto Serif SC", Georgia, serif;
-  font-size: 2.15rem;
+  font-size: 1.4rem;
   line-height: 1;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: var(--text-primary);
-}
-
-.brand-subtitle {
-  font-size: 0.94rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.03em;
-  line-height: 1.2;
-  transform: translateY(2px);
 }
 
 .header-actions {
@@ -520,23 +484,19 @@ async function exportImage() {
   }
 
   .app-header {
-    padding: 16px 20px;
+    padding: 10px 20px;
   }
 
   .app-title {
-    font-size: 1.72rem;
-  }
-
-  .brand-subtitle {
-    font-size: 0.86rem;
+    font-size: 1.25rem;
   }
 }
 
 @media (max-width: 720px) {
   .app-header {
     margin: 8px 8px 0;
-    padding: 14px 16px;
-    border-radius: 24px;
+    padding: 10px 14px;
+    border-radius: 20px;
   }
 
   .header-actions {
@@ -548,12 +508,6 @@ async function exportImage() {
   .app-main {
     padding: 8px;
     gap: 8px;
-  }
-
-  .brand-copy {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
   }
 
   .editor-section,
