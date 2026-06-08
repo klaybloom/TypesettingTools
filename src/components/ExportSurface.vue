@@ -1,6 +1,12 @@
 <template>
   <div class="export-surface" aria-hidden="true">
-    <div ref="exportContentRef" class="export-content" v-html="content"></div>
+    <div
+      ref="exportContentRef"
+      class="export-content"
+      :class="{ 'md-native': native }"
+      :style="{ width: native ? '720px' : '375px' }"
+      v-html="content"
+    ></div>
   </div>
 </template>
 
@@ -11,6 +17,10 @@ defineProps({
   content: {
     type: String,
     default: ''
+  },
+  native: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -24,14 +34,12 @@ defineExpose({ exportContentRef })
   position: fixed;
   left: -100000px;
   top: 0;
-  width: 407px;
   pointer-events: none;
   background: #ffffff;
 }
 
 .export-content {
-  width: 375px;
-  padding: 20px 16px;
+  padding: 24px 20px;
   background: #ffffff;
 }
 </style>

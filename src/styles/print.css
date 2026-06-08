@@ -1,0 +1,61 @@
+/* 打印 / 导出 PDF 专用样式
+ * exportPdf() 临时给 <body> 加 .printing，配合 @media print，
+ * 隐藏全部应用 chrome，仅打印文章内容（文章样式为元素内联，天然保真）。
+ */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  body {
+    background: #ffffff !important;
+  }
+
+  /* 隐藏所有应用界面，只保留打印面板 */
+  .app-header,
+  .app-main,
+  .style-panel-container,
+  .export-surface,
+  .toast {
+    display: none !important;
+  }
+
+  .print-surface {
+    display: block !important;
+    position: static !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-content section {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .print-content.md-native {
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000;
+  }
+
+  /* 分页控制：标题不与正文分离、整块不被截断 */
+  .print-content h1,
+  .print-content h2,
+  .print-content h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .print-content pre,
+  .print-content table,
+  .print-content img,
+  .print-content blockquote {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-content p {
+    orphans: 3;
+    widows: 3;
+  }
+}

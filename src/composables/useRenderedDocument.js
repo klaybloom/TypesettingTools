@@ -1,5 +1,5 @@
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { formatText } from '../utils/formatter.js'
+import { formatText, renderPlain } from '../utils/formatter.js'
 
 const DEFAULT_MARKDOWN_SAMPLE = `# Markdown 语法示例
 
@@ -74,7 +74,12 @@ export function useRenderedDocument(articleStyleSettings) {
 
   const formattedContent = computed(() => {
     if (!debouncedContent.value.trim()) return ''
-    return formatText(debouncedContent.value, debouncedSettings.value)
+    return formatText(debouncedContent.value, debouncedSettings.value, debouncedSettings.value.wechatTemplateId)
+  })
+
+  const nativeContent = computed(() => {
+    if (!debouncedContent.value.trim()) return ''
+    return renderPlain(debouncedContent.value)
   })
 
   const charCount = computed(() => rawContent.value.replace(/\s/g, '').length)
@@ -93,6 +98,7 @@ export function useRenderedDocument(articleStyleSettings) {
   return {
     rawContent,
     formattedContent,
+    nativeContent,
     charCount,
     readingTime,
     defaultMarkdownSample: DEFAULT_MARKDOWN_SAMPLE
