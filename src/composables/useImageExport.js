@@ -66,3 +66,30 @@ export function useImageExport() {
     exportElementAsImage
   }
 }
+
+/**
+ * 把元素渲染为 canvas（不下载）。供卡片单张/批量导出与复制复用。
+ * scale 默认 3 → 360×480 卡片输出约 1080×1440。
+ */
+export async function renderElementToCanvas(element, scale = 3) {
+  const html2canvas = (await import('html2canvas')).default
+  return html2canvas(element, {
+    backgroundColor: null,
+    scale,
+    useCORS: true,
+    logging: false
+  })
+}
+
+export function downloadCanvas(canvas, fileName) {
+  const link = document.createElement('a')
+  link.download = fileName
+  link.href = canvas.toDataURL('image/png')
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+}
+
+export function canvasToBlob(canvas) {
+  return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
+}
