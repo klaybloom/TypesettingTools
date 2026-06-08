@@ -195,11 +195,33 @@ md.renderer.rules.s_close = () => '</s>'
  * 仅放行 http(s) / mailto / ftp / 安全 data:image URI），因此 href/src 已经是
  * "协议安全"的；这里只在写入 HTML 属性时再做一次 escape，防止属性闭合 / XSS。
  */
-export function formatText(text, settings) {
-    currentStyles = createArticleStyles(settings)
+export function formatText(text, settings, templateId = 'classic') {
+    currentStyles = createArticleStyles(settings, templateId)
     const normalized = normalizePunctuation(text)
     const bodyHtml = md.render(normalized)
     return `<section style="${currentStyles.section}">\n${bodyHtml}</section>`
 }
 
-export default { formatText }
+/**
+ * 用给定的样式表渲染 Markdown，返回「无 section 包裹」的正文 HTML。
+ * 供小红书卡片等需要自定义包裹/样式的场景复用同一套 markdown-it 渲染。
+ */
+export function renderWithStyles(text, styleMap) {
+    currentStyles = styleMap
+    const normalized = normalizePunctuation(text)
+    return md.render(normalized)
+}
+
+// 所有样式键都返回空串 → 渲染出不含内联样式的「干净」HTML，由 CSS class 接管排版
+const EMPTY_STYLES = new Proxy({}, { get: () => '' })
+
+/**
+ * 原生预览渲染：输出无内联样式的 body HTML，交给 .md-native 的 CSS 排版。
+ */
+export function renderPlain(text) {
+    currentStyles = EMPTY_STYLES
+    const normalized = normalizePunctuation(text)
+    return md.render(normalized)
+}
+
+export default { formatText, renderWithStyles, renderPlain }

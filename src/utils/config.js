@@ -10,7 +10,8 @@ export const defaultArticleStyleSettings = {
     textColor: '#2B2B2B',
     accentColor: '#1F7A62',
     paragraphMargin: 16,
-    textIndent: false
+    textIndent: false,
+    wechatTemplateId: 'classic'
 }
 
 // 推荐颜色
@@ -50,3 +51,11 @@ export const articleStylePresets = [
 ]
 
 export default defaultArticleStyleSettings
+
+// 小红书卡片默认设置
+export const defaultCardSettings = {
+    templateId: 'border',
+    colorSchemeId: 'red',
+    fontFamilyId: 'hand',
+    fontSize: 16
+}

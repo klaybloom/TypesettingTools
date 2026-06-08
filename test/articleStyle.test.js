@@ -16,6 +16,7 @@ describe('articleStyle', () => {
     expect(styles.p).toContain('text-indent: 2em')
     expect(styles.h1).toContain('background: #ff0000')
     expect(styles.h1).toContain('color: #ffffff')
-    expect(styles.h2).toContain('border-left: 4px solid #ff0000')
+    expect(styles.h2).toContain('text-align: center')
+    expect(styles.h2).toContain('border-bottom: 3px solid #ff0000')
   })
 })

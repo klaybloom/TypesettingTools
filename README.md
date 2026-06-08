@@ -1,36 +1,42 @@
-# mdpress · 微信公众号 Markdown 排版器
+# mdpress · Markdown 多模式内容创作工具
 
-一款基于 Vue 3 + Vite 构建的微信公众号文章排版工具，支持 Markdown 编写、实时预览、一键复制和导出图片，让公众号排版更高效、更美观。
+一款基于 Vue 3 + Vite 构建的 Markdown 内容创作工具，支持**原生预览**、**微信公众号排版**和**小红书卡片生成**三种模式，让 Markdown 写作一次、多端分发。
 
 ## ✨ 功能特性
 
-### 📖 Markdown 编辑与解析
-- 基于 **markdown-it** 的强大解析引擎，完整支持 GFM（GitHub Flavored Markdown）语法
-- 支持标题、段落、列表（有序/无序）、引用、表格、脚注、任务列表等常见格式
-- 支持图片和链接的渲染
+### 📝 Markdown 编辑
+- 基于 **markdown-it** 的解析引擎，完整支持 GFM 语法
+- 左侧编辑器常驻，右侧三种预览模式实时联动
+- 支持标题、列表、引用、表格、脚注、任务列表、代码块等格式
+- 集成 **highlight.js** 代码语法高亮
+- 撤销 / 重做历史、Markdown 工具栏
 
-### 🎨 代码高亮
-- 集成 **highlight.js**，支持多种编程语言的语法高亮
-- 代码块自动识别语言并着色，提升阅读体验
+### 👁 原生预览
+- GitHub 风格的干净文档排版
+- 支持桌面 / 手机宽度切换
+- 导出为长截图（PNG）或 PDF
 
-### 🖌️ 主题与样式
-- 界面外观主题与文章排版样式分层管理，减少预览与导出结果偏差
-- 内置多套文章排版预设，一键切换不同风格
-- 可自定义正文字号、字体颜色、段落间距等排版参数
-- 支持首行缩进选项
-- 样式面板侧边栏，设置便捷直观
+### 📱 公众号排版
+- 移动端宽度模拟器预览，贴近公众号实际效果
+- **7 套公众号模板**：经典、杂志、极简、极客、暖阳、色块、程序
+- 模板覆盖完整标题体系、引用、分割线，切换差异一目了然
+- 自定义正文字号、行间距、正文色、强调色、首行缩进
+- 悬浮样式面板，鼠标悬浮即可切换模板与参数
+- **一键复制**为内联样式 HTML，直接粘贴到公众号后台编辑器
+- 导出为图片或 PDF
 
-### 👀 实时预览
-- 左右分栏布局，左侧编辑、右侧实时预览
-- 编辑器与预览区域同步滚动，所见即所得
+### 🖼 小红书卡片
+- **自动拆卡引擎**：长文自动拆分为多张 3:4 竖版卡片
+- 离屏测量 + 贪心装箱算法，智能避免在段落中间断页
+- **6 套卡片模板**：边框、简约、备忘、Twitter、手写、几何
+- 6 种配色方案 + 4 种字体风格 + 字号滑杆
+- 翻页滑杆浏览全部卡片
+- 单张 / 全部导出 1080×1440 高清 PNG
 
-### 📋 一键复制
-- 将排版后的富文本内容一键复制到剪贴板
-- 直接粘贴至微信公众号编辑器，格式完美保留
-
-### 📸 导出图片
-- 支持将排版内容导出为长截图（整页）
-- 基于 **html2canvas** 实现高质量图片导出
+### 🎨 界面
+- 深色 / 浅色模式切换
+- 右侧框内 Tab 切换，编辑器常驻不丢失上下文
+- 导出菜单下拉，头部按钮精简不杂乱
 
 ## 🛠️ 技术栈
 
@@ -62,39 +68,54 @@ npm run dev
 npm run build
 ```
 
-### 预览生产构建
+### 运行测试
 
 ```bash
-npm run preview
+npm test
 ```
 
 ## 📁 项目结构
 
 ```
 src/
-├── App.vue                       # 主应用容器
-├── main.js                       # 应用入口
+├── App.vue                            # 主应用容器
+├── main.js                            # 应用入口
 ├── components/
-│   ├── Editor.vue                # Markdown 编辑器
-│   ├── ExportSurface.vue         # 离屏导出画布
-│   ├── Preview.vue               # 桌面 / 手机预览
-│   └── StylePanel.vue            # 排版设置面板
+│   ├── Editor.vue                     # Markdown 编辑器
+│   ├── NativePreview.vue              # 原生 Markdown 预览
+│   ├── Preview.vue                    # 公众号桌面/手机预览
+│   ├── CardCanvas.vue                 # 小红书卡片渲染
+│   ├── CardPane.vue                   # 卡片翻页 + 预览
+│   ├── CardExportSurface.vue          # 卡片离屏导出画布
+│   ├── WechatPane.vue                 # 公众号预览容器
+│   ├── ExportSurface.vue              # 文章离屏导出画布
+│   ├── PrintSurface.vue               # PDF 打印画布
+│   ├── ExportMenu.vue                 # 导出下拉菜单
+│   └── SettingsPopover.vue            # 悬浮样式设置面板
 ├── composables/
-│   ├── useAppearance.js          # 深浅模式
-│   ├── useClipboardHtml.js       # HTML 富文本复制
-│   ├── useHistory.js             # 撤销 / 重做历史
-│   ├── useImageExport.js         # 长图导出
+│   ├── useAppearance.js               # 深浅模式
+│   ├── useClipboardHtml.js            # HTML 富文本复制
+│   ├── useHistory.js                  # 撤销/重做历史
+│   ├── useImageExport.js              # 长图/PNG 导出
+│   ├── useCardSplitter.js             # 小红书自动拆卡引擎
+│   ├── useCardSettings.js             # 卡片设置持久化
+│   ├── useViewMode.js                 # 视图模式状态
 │   ├── usePersistentStyleSettings.js  # 排版设置持久化
-│   ├── useRenderedDocument.js    # Markdown → 排版后 HTML
-│   └── useToast.js               # 全局轻提示
+│   ├── useRenderedDocument.js         # Markdown → HTML 渲染
+│   └── useToast.js                    # 全局轻提示
 ├── styles/
-│   ├── base.css                  # 基础重置
-│   └── variables.css             # 主题 CSS 变量
+│   ├── base.css                       # 基础重置
+│   ├── variables.css                  # 主题 CSS 变量
+│   ├── native-preview.css             # 原生预览样式
+│   └── print.css                      # 打印/PDF 样式
 └── utils/
-    ├── articleStyle.js           # 文章内联样式表
-    ├── config.js                 # 默认排版与预设
-    ├── formatter.js              # markdown-it 渲染管线
-    └── punctuation.js            # 中文标点规范化
+    ├── articleStyle.js                # 文章内联样式表
+    ├── cardStyle.js                   # 卡片样式引擎
+    ├── cardTemplates.js               # 卡片模板与配色
+    ├── config.js                      # 默认配置
+    ├── formatter.js                   # markdown-it 渲染管线
+    ├── wechatTemplates.js             # 公众号模板系统
+    └── punctuation.js                 # 中文标点规范化
 ```
 
 ## 📄 License

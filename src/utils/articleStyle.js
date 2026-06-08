@@ -1,3 +1,5 @@
+import { getWechatTemplateOverrides } from './wechatTemplates.js'
+
 function getBaseStyles(settings) {
   return {
     section: `font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif; color: ${settings.textColor}; font-size: ${settings.fontSize}px; line-height: ${settings.lineHeight}; letter-spacing: ${settings.letterSpacing}px;`,
@@ -9,7 +11,7 @@ function getBaseStyles(settings) {
 function getHeadingStyles(settings) {
   return {
     h1: `display: table; width: auto; font-size: 22px; font-weight: 700; color: #ffffff; background: ${settings.accentColor}; padding: 12px 18px; border-radius: 12px; margin: 0 auto 24px; line-height: 1.4; text-align: center;`,
-    h2: `font-size: 18px; font-weight: 600; color: ${settings.textColor}; margin: 24px 0 16px 0; padding-left: 12px; border-left: 4px solid ${settings.accentColor}; line-height: 1.5;`,
+    h2: `display: table; width: auto; font-size: 19px; font-weight: 700; color: ${settings.textColor}; text-align: center; margin: 28px auto 16px; padding-bottom: 8px; border-bottom: 3px solid ${settings.accentColor}; line-height: 1.5;`,
     h3: `font-size: 16px; font-weight: 600; color: ${settings.textColor}; margin: 20px 0 12px 0;`
   }
 }
@@ -66,8 +68,8 @@ function getFootnoteStyles(settings) {
   }
 }
 
-export function createArticleStyles(settings) {
-  return {
+export function createArticleStyles(settings, templateId = 'classic') {
+  const base = {
     ...getBaseStyles(settings),
     ...getHeadingStyles(settings),
     ...getTextDecorationStyles(settings),
@@ -77,4 +79,6 @@ export function createArticleStyles(settings) {
     ...getOtherStyles(settings),
     ...getFootnoteStyles(settings)
   }
+  const overrides = getWechatTemplateOverrides(templateId, settings)
+  return overrides ? { ...base, ...overrides } : base
 }
