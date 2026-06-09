@@ -1,6 +1,6 @@
 import { onMounted, ref, watch } from 'vue'
 
-export const VIEW_MODES = ['preview', 'wechat', 'xhs']
+export const VIEW_MODES = ['edit', 'preview', 'wechat', 'xhs']
 
 const STORAGE_KEY = 'viewMode'
 const DEFAULT_MODE = 'preview'

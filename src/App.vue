@@ -1,6 +1,6 @@
 <template>
-  <div class="app-container" :data-mode="colorMode">
-    <!-- 顶部导航栏 -->
+  <div class="app-container" :data-mode="colorMode" :data-layout="effectiveLayout">
+    <!-- 顶部导航栏：logo · tabs · 动作按钮 -->
     <header class="app-header">
       <div class="header-brand">
         <svg class="logo-icon" viewBox="0 0 24 24" width="22" height="22">
@@ -9,12 +9,77 @@
         <h1 class="app-title">mdpress</h1>
       </div>
 
+      <nav class="mode-tabs">
+        <button
+          v-for="tab in modeTabs"
+          :key="tab.id"
+          class="mode-btn"
+          :class="{ active: viewMode === tab.id }"
+          @click="setViewMode(tab.id)"
+        >{{ tab.label }}</button>
+      </nav>
+
       <div class="header-actions">
-        <div class="stats-display">
-          <span class="stat-item">{{ charCount }} 字</span>
-          <span class="stat-divider">·</span>
-          <span class="stat-item">{{ readingTime }} 分钟</span>
-        </div>
+        <!-- 布局切换：单栏 / 双栏（窄屏强制单栏时隐藏） -->
+        <button
+          v-show="!isNarrow"
+          class="icon-btn layout-toggle"
+          @click="toggleLayout"
+          :title="layoutMode === 'split' ? '切换到单栏' : '切换到双栏'"
+          aria-label="切换布局"
+        >
+          <svg v-if="layoutMode === 'split'" viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1zm7 2H5v10h6V7zm2 10h6V7h-6v10z"/>
+          </svg>
+          <svg v-else viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M5 5h14a1 1 0 011 1v12a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1zm1 2v10h12V7H6z"/>
+          </svg>
+        </button>
+
+        <!-- 预览 -->
+        <template v-if="viewMode === 'preview'">
+          <ExportMenu :items="previewExportItems" :disabled="!nativeContent || isExporting" @select="onExport" />
+        </template>
+
+        <!-- 公众号：桌面/手机 + 样式 + 复制 + 导出 -->
+        <template v-else-if="viewMode === 'wechat'">
+          <div class="device-toggle">
+            <button class="device-btn" :class="{ active: previewMode === 'desktop' }" @click="previewMode = 'desktop'" title="桌面预览" aria-label="桌面预览">
+              <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/></svg>
+            </button>
+            <button class="device-btn" :class="{ active: previewMode === 'mobile' }" @click="previewMode = 'mobile'" title="手机预览" aria-label="手机预览">
+              <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+            </button>
+          </div>
+          <SettingsPopover
+            mode="wechat"
+            :wechat-settings="articleStyleSettings"
+            :card-settings="cardSettings"
+            @update:wechat-settings="articleStyleSettings = $event"
+            @update:card-settings="cardSettings = $event"
+          />
+          <button class="action-btn primary" @click="copyHtml" :disabled="!formattedContent">
+            <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            {{ copySuccess ? '已复制' : '复制' }}
+          </button>
+          <ExportMenu :items="wechatExportItems" :disabled="!formattedContent || isExporting" @select="onExport" />
+        </template>
+
+        <!-- 小红书：样式 + 复制图片 + 导出 -->
+        <template v-else-if="viewMode === 'xhs'">
+          <SettingsPopover
+            mode="xhs"
+            :wechat-settings="articleStyleSettings"
+            :card-settings="cardSettings"
+            @update:wechat-settings="articleStyleSettings = $event"
+            @update:card-settings="cardSettings = $event"
+          />
+          <button class="action-btn primary" @click="copyCardImage" :disabled="!cards.length || cardExporting">
+            <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            复制图片
+          </button>
+          <ExportMenu :items="cardExportItems" :disabled="!cards.length || cardExporting" @select="onExport" />
+        </template>
 
         <button
           class="icon-btn mode-toggle"
@@ -32,82 +97,39 @@
       </div>
     </header>
 
-    <!-- 主内容区 -->
+    <!-- 主内容区：单栏居中 / 双栏并排 -->
     <main class="app-main">
-      <!-- 左侧编辑器（常驻） -->
-      <section class="editor-section">
+      <!-- 双栏：左侧常驻编辑器 + 可拖拽分隔线 -->
+      <template v-if="effectiveLayout === 'split'">
+        <section class="editor-section" :style="{ flexBasis: splitRatio * 100 + '%' }">
+          <Editor
+            v-model="rawContent"
+            :char-count="charCount"
+            :scroll-ratio="scrollRatio"
+            placeholder="粘贴文章内容，支持 Markdown..."
+            @scroll="onEditorScroll"
+          />
+        </section>
+        <div
+          class="split-divider"
+          @pointerdown="startResize"
+          title="拖拽调整左右宽度"
+          role="separator"
+          aria-orientation="vertical"
+        ></div>
+      </template>
+
+      <section class="preview-section">
         <Editor
+          v-if="effectiveLayout === 'single' && viewMode === 'edit'"
           v-model="rawContent"
           :char-count="charCount"
           :scroll-ratio="scrollRatio"
           placeholder="粘贴文章内容，支持 Markdown..."
           @scroll="onEditorScroll"
         />
-      </section>
-
-      <!-- 右侧：框内 Tab 切换 -->
-      <section class="preview-section">
-        <div class="section-header">
-          <nav class="mode-tabs">
-            <button
-              v-for="tab in modeTabs"
-              :key="tab.id"
-              class="mode-btn"
-              :class="{ active: viewMode === tab.id }"
-              @click="setViewMode(tab.id)"
-            >{{ tab.label }}</button>
-          </nav>
-
-          <div class="section-actions">
-            <!-- 预览 -->
-            <template v-if="viewMode === 'preview'">
-              <ExportMenu :items="previewExportItems" :disabled="!nativeContent || isExporting" @select="onExport" />
-            </template>
-
-            <!-- 公众号：桌面/手机 + 样式 + 复制 + 导出 -->
-            <template v-else-if="viewMode === 'wechat'">
-              <div class="device-toggle">
-                <button class="device-btn" :class="{ active: previewMode === 'desktop' }" @click="previewMode = 'desktop'" title="桌面预览" aria-label="桌面预览">
-                  <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/></svg>
-                </button>
-                <button class="device-btn" :class="{ active: previewMode === 'mobile' }" @click="previewMode = 'mobile'" title="手机预览" aria-label="手机预览">
-                  <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
-                </button>
-              </div>
-              <SettingsPopover
-                mode="wechat"
-                :wechat-settings="articleStyleSettings"
-                :card-settings="cardSettings"
-                @update:wechat-settings="articleStyleSettings = $event"
-                @update:card-settings="cardSettings = $event"
-              />
-              <button class="action-btn primary" @click="copyHtml" :disabled="!formattedContent">
-                <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                {{ copySuccess ? '已复制' : '复制' }}
-              </button>
-              <ExportMenu :items="wechatExportItems" :disabled="!formattedContent || isExporting" @select="onExport" />
-            </template>
-
-            <!-- 小红书：样式 + 复制图片 + 导出 -->
-            <template v-else-if="viewMode === 'xhs'">
-              <SettingsPopover
-                mode="xhs"
-                :wechat-settings="articleStyleSettings"
-                :card-settings="cardSettings"
-                @update:wechat-settings="articleStyleSettings = $event"
-                @update:card-settings="cardSettings = $event"
-              />
-              <button class="action-btn primary" @click="copyCardImage" :disabled="!cards.length || cardExporting">
-                <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                复制图片
-              </button>
-              <ExportMenu :items="cardExportItems" :disabled="!cards.length || cardExporting" @select="onExport" />
-            </template>
-          </div>
-        </div>
-
         <NativePreview
-          v-if="viewMode === 'preview'"
+          v-else-if="viewMode === 'preview'"
           :content="nativeContent"
           :scrollRatio="scrollRatio"
           @scroll="onPreviewScroll"
@@ -145,7 +167,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import CardExportSurface from './components/CardExportSurface.vue'
 import CardPane from './components/CardPane.vue'
 import Editor from './components/Editor.vue'
@@ -161,6 +183,7 @@ import { useCardSettings } from './composables/useCardSettings.js'
 import { useCardSplitter } from './composables/useCardSplitter.js'
 import { useClipboardHtml } from './composables/useClipboardHtml.js'
 import { useImageExport } from './composables/useImageExport.js'
+import { useLayout } from './composables/useLayout.js'
 import { usePersistentStyleSettings } from './composables/usePersistentStyleSettings.js'
 import { useRenderedDocument } from './composables/useRenderedDocument.js'
 import { useToast } from './composables/useToast.js'
@@ -175,6 +198,7 @@ const cardExportRef = ref(null)
 const cardIndex = ref(0)
 
 const { viewMode, setViewMode } = useViewMode()
+const { layoutMode, effectiveLayout, isNarrow, splitRatio, toggleLayout, startResize } = useLayout()
 const { colorMode, toggleColorMode } = useAppearance()
 const { copyHtmlToClipboard } = useClipboardHtml()
 const { isExporting, exportElementAsImage } = useImageExport()
@@ -182,17 +206,27 @@ const { toast, showToast } = useToast()
 const { articleStyleSettings } = usePersistentStyleSettings(defaultArticleStyleSettings)
 const { cardSettings } = useCardSettings()
 
-const { rawContent, formattedContent, nativeContent, charCount, readingTime } = useRenderedDocument(articleStyleSettings)
+const { rawContent, formattedContent, nativeContent, charCount } = useRenderedDocument(articleStyleSettings)
 
 const isNative = computed(() => viewMode.value === 'preview')
 const isXhs = computed(() => viewMode.value === 'xhs')
 const { cards, splitting, overflowNotice } = useCardSplitter(rawContent, cardSettings, isXhs)
 
-const modeTabs = [
-  { id: 'preview', label: '预览' },
-  { id: 'wechat', label: '公众号' },
-  { id: 'xhs', label: '小红书' }
-]
+const modeTabs = computed(() => {
+  const tabs = [
+    { id: 'preview', label: '预览' },
+    { id: 'wechat', label: '公众号' },
+    { id: 'xhs', label: '小红书' }
+  ]
+  // 双栏下编辑器是常驻左栏，不再需要「编辑」tab
+  if (effectiveLayout.value !== 'split') tabs.unshift({ id: 'edit', label: '编辑' })
+  return tabs
+})
+
+// 切到双栏时若停留在「编辑」，自动落到预览（编辑器已在左栏常驻）
+watch(effectiveLayout, (layout) => {
+  if (layout === 'split' && viewMode.value === 'edit') setViewMode('preview')
+}, { immediate: true })
 
 const previewExportItems = [
   { key: 'image', label: '导出图片', icon: 'image' },
@@ -307,10 +341,13 @@ async function exportAllCards() {
 }
 
 .app-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  margin: 10px 10px 0;
+  gap: 12px;
+  width: calc(100% - 20px);
+  max-width: 960px;
+  margin: 10px auto 0;
   padding: 10px 24px;
   background: var(--glass-surface);
   border: 1px solid var(--glass-highlight);
@@ -364,10 +401,26 @@ async function exportAllCards() {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  justify-self: end;
 }
 
-/* 模式切换（位于右侧框头部） */
+/* 顶栏中的次级动作（样式 / 导出）收成图标按钮，标签靠 tooltip + 下拉承载 */
+.header-actions .style-btn,
+.header-actions .export-btn {
+  padding: 8px;
+  gap: 0;
+}
+
+.header-actions .style-btn .btn-label,
+.header-actions .export-btn .btn-label,
+.header-actions .export-btn .chevron {
+  display: none;
+}
+
+/* 模式切换 */
 .mode-tabs {
   display: flex;
   gap: 4px;
@@ -388,34 +441,7 @@ async function exportAllCards() {
   color: var(--text-primary);
 }
 
-/* 统计信息显示 */
-.stats-display {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  background: var(--ui-muted-bg);
-  border: 1px solid var(--ui-muted-border);
-  border-radius: 999px;
-  box-shadow: inset 0 1px 0 var(--glass-highlight);
-  transition:
-    background var(--transition-normal),
-    border-color var(--transition-normal),
-    color var(--transition-normal),
-    box-shadow var(--transition-normal);
-}
-
-.stat-item {
-  font-variant-numeric: tabular-nums;
-}
-
-.stat-divider {
-  opacity: 0.5;
-}
-
-/* 按钮样式 - 黑白灰配色 */
+/* 按钮样式 */
 .action-btn {
   display: flex;
   align-items: center;
@@ -490,21 +516,21 @@ async function exportAllCards() {
   transform: scale(0.92);
 }
 
-/* 主内容区 */
+/* 主内容区：单栏居中 */
 .app-main {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  display: flex;
+  justify-content: center;
   padding: 10px;
   background: transparent;
   overflow: hidden;
 }
 
-.editor-section,
 .preview-section {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  max-width: 960px;
   background: var(--glass-surface);
   border-radius: 30px;
   border: 1px solid var(--glass-highlight);
@@ -520,34 +546,76 @@ async function exportAllCards() {
     box-shadow var(--transition-normal);
 }
 
-.section-header {
+/* 双栏：左编辑器 + 分隔线 + 右预览，整条铺满 */
+.app-container[data-layout="split"] .app-header {
+  max-width: none;
+}
+
+.app-container[data-layout="split"] .app-main {
+  justify-content: stretch;
+  gap: 0;
+}
+
+.editor-section {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 16px;
-  min-height: 60px;
-  border-bottom: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.14);
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-width: 0;
+  background: var(--glass-surface);
+  border-radius: 30px;
+  border: 1px solid var(--glass-highlight);
+  box-shadow:
+    0 20px 44px var(--shadow-color),
+    inset 0 1px 0 var(--glass-highlight);
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   transition:
     background var(--transition-normal),
     border-color var(--transition-normal),
-    color var(--transition-normal);
+    box-shadow var(--transition-normal);
 }
 
-.section-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+.app-container[data-layout="split"] .preview-section {
+  flex: 1 1 0;
+  max-width: none;
+  min-width: 0;
 }
 
-.section-title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--text-secondary);
+/* 轻量可拖拽分隔线：透明命中区 + 居中细条 */
+.split-divider {
+  flex: 0 0 14px;
+  align-self: stretch;
+  position: relative;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.split-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: var(--ui-muted-border);
+  opacity: 0.6;
+  transition: opacity var(--transition-fast), background var(--transition-fast), height var(--transition-fast);
+}
+
+.split-divider:hover::before,
+body.resizing-cols .split-divider::before {
+  opacity: 1;
+  height: 72px;
+  background: var(--text-tertiary);
+}
+
+/* 拖拽时锁定光标与选区 */
+body.resizing-cols {
+  cursor: col-resize;
+  user-select: none;
 }
 
 /* 桌面/手机 图标切换 */
@@ -642,11 +710,6 @@ async function exportAllCards() {
 }
 
 @media (max-width: 1024px) {
-  .app-main {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
-  }
-
   .app-header {
     padding: 10px 20px;
   }
@@ -658,9 +721,20 @@ async function exportAllCards() {
 
 @media (max-width: 720px) {
   .app-header {
-    margin: 8px 8px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(100% - 16px);
+    margin: 8px auto 0;
     padding: 10px 14px;
     border-radius: 20px;
+  }
+
+  .mode-tabs {
+    order: 1;
+    flex-basis: 100%;
+    justify-content: center;
   }
 
   .header-actions {
@@ -671,10 +745,8 @@ async function exportAllCards() {
 
   .app-main {
     padding: 8px;
-    gap: 8px;
   }
 
-  .editor-section,
   .preview-section {
     border-radius: 24px;
   }

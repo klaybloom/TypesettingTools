@@ -1,8 +1,8 @@
 <template>
   <div ref="triggerRef" class="export-menu">
-    <button class="action-btn" :disabled="disabled" @click.stop="toggle">
+    <button class="action-btn export-btn" :disabled="disabled" title="导出" @click.stop="toggle">
       <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      导出
+      <span class="btn-label">导出</span>
       <svg class="chevron" :class="{ open }" viewBox="0 0 24 24" width="11" height="11"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
     </button>
     <Teleport to="body">
