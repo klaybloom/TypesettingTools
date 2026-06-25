@@ -387,6 +387,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 <style scoped>
 .editor-wrapper {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: visible;
