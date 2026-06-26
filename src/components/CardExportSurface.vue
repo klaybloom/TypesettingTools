@@ -36,29 +36,42 @@ async function renderCard(blocks, index, total) {
 }
 
 async function exportOne(blocks, index, total, prefix = 'xhs-card') {
-  const canvas = await renderCard(blocks, index, total)
-  downloadCanvas(canvas, `${prefix}-${index + 1}.png`)
-  active.value = null
+  try {
+    const canvas = await renderCard(blocks, index, total)
+    downloadCanvas(canvas, `${prefix}-${index + 1}.png`)
+  } catch (e) {
+    console.error('[mdpress] card export error:', e)
+    throw new Error('卡片导出失败，请重试')
+  } finally {
+    active.value = null
+  }
 }
 
 async function exportAll(cards, prefix = 'xhs-card') {
-  for (let i = 0; i < cards.length; i++) {
-    const canvas = await renderCard(cards[i], i, cards.length)
-    downloadCanvas(canvas, `${prefix}-${i + 1}.png`)
+  try {
+    for (let i = 0; i < cards.length; i++) {
+      const canvas = await renderCard(cards[i], i, cards.length)
+      downloadCanvas(canvas, `${prefix}-${i + 1}.png`)
+    }
+  } catch (e) {
+    console.error('[mdpress] batch card export error:', e)
+    throw new Error('卡片批量导出失败，请重试')
+  } finally {
+    active.value = null
   }
-  active.value = null
 }
 
 async function copyOne(blocks, index, total) {
-  const canvas = await renderCard(blocks, index, total)
-  const blob = await canvasToBlob(canvas)
-  active.value = null
-  if (!blob) return false
   try {
+    const canvas = await renderCard(blocks, index, total)
+    const blob = await canvasToBlob(canvas)
+    if (!blob) return false
     await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
     return true
   } catch (_) {
     return false
+  } finally {
+    active.value = null
   }
 }
 

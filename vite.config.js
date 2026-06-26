@@ -33,8 +33,8 @@ export default defineConfig({
         chunkSizeWarningLimit: 1000,
         // 启用 CSS 代码分割
         cssCodeSplit: true,
-        // 构建目标
-        target: 'es2015',
+        // 构建目标：es2020 允许 ?? / ?. / BigInt 等原生语法，减小 polyfill 体积
+        target: 'es2020',
         // 生成 sourcemap
         sourcemap: false
     },

@@ -21,7 +21,15 @@ export function useImageExport() {
     isExporting.value = true
 
     try {
-      const html2canvas = (await import('html2canvas')).default
+      let html2canvas
+      try {
+        html2canvas = (await import('html2canvas')).default
+      } catch (loadErr) {
+        return {
+          ok: false,
+          message: '图片导出组件加载失败，请检查网络后重试'
+        }
+      }
       const canvas = await html2canvas(element, {
         backgroundColor: '#ffffff',
         scale: 2,
@@ -72,7 +80,12 @@ export function useImageExport() {
  * scale 默认 3 → 360×480 卡片输出约 1080×1440。
  */
 export async function renderElementToCanvas(element, scale = 3) {
-  const html2canvas = (await import('html2canvas')).default
+  let html2canvas
+  try {
+    html2canvas = (await import('html2canvas')).default
+  } catch (e) {
+    throw new Error('图片导出组件加载失败，请检查网络后重试')
+  }
   return html2canvas(element, {
     backgroundColor: null,
     scale,

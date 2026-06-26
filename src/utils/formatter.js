@@ -19,11 +19,8 @@ import xml from 'highlight.js/lib/languages/xml'
 import json from 'highlight.js/lib/languages/json'
 import bash from 'highlight.js/lib/languages/bash'
 import typescript from 'highlight.js/lib/languages/typescript'
-import java from 'highlight.js/lib/languages/java'
 import sql from 'highlight.js/lib/languages/sql'
 import markdown from 'highlight.js/lib/languages/markdown'
-import go from 'highlight.js/lib/languages/go'
-import swift from 'highlight.js/lib/languages/swift'
 
 hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('js', javascript)
@@ -38,12 +35,9 @@ hljs.registerLanguage('sh', bash)
 hljs.registerLanguage('shell', bash)
 hljs.registerLanguage('typescript', typescript)
 hljs.registerLanguage('ts', typescript)
-hljs.registerLanguage('java', java)
 hljs.registerLanguage('sql', sql)
 hljs.registerLanguage('markdown', markdown)
 hljs.registerLanguage('md', markdown)
-hljs.registerLanguage('go', go)
-hljs.registerLanguage('swift', swift)
 
 // HTML 属性上下文转义：& < > " ' 全部 escape，避免属性闭合 / XSS
 function escapeAttr(str) {
@@ -197,9 +191,15 @@ md.renderer.rules.s_close = () => '</s>'
  */
 export function formatText(text, settings, templateId = 'classic') {
     currentStyles = createArticleStyles(settings, templateId)
-    const normalized = normalizePunctuation(text)
-    const bodyHtml = md.render(normalized)
-    return `<section style="${currentStyles.section}">\n${bodyHtml}</section>`
+    try {
+        const normalized = normalizePunctuation(text)
+        const bodyHtml = md.render(normalized)
+        return `<section style="${currentStyles.section}">\n${bodyHtml}</section>`
+    } catch (e) {
+        console.error('[mdpress] formatText error:', e)
+        const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        return `<section style="${currentStyles.section}"><pre>${escaped}</pre></section>`
+    }
 }
 
 /**
@@ -208,8 +208,13 @@ export function formatText(text, settings, templateId = 'classic') {
  */
 export function renderWithStyles(text, styleMap) {
     currentStyles = styleMap
-    const normalized = normalizePunctuation(text)
-    return md.render(normalized)
+    try {
+        const normalized = normalizePunctuation(text)
+        return md.render(normalized)
+    } catch (e) {
+        console.error('[mdpress] renderWithStyles error:', e)
+        return `<pre>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`
+    }
 }
 
 // 所有样式键都返回空串 → 渲染出不含内联样式的「干净」HTML，由 CSS class 接管排版
@@ -220,8 +225,13 @@ const EMPTY_STYLES = new Proxy({}, { get: () => '' })
  */
 export function renderPlain(text) {
     currentStyles = EMPTY_STYLES
-    const normalized = normalizePunctuation(text)
-    return md.render(normalized)
+    try {
+        const normalized = normalizePunctuation(text)
+        return md.render(normalized)
+    } catch (e) {
+        console.error('[mdpress] renderPlain error:', e)
+        return `<pre>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`
+    }
 }
 
 export default { formatText, renderWithStyles, renderPlain }

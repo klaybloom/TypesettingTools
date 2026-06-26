@@ -180,17 +180,21 @@ function handleScroll() {
   emit('scroll', ratio)
 }
 
+let scrollRafId = 0
 watch(() => props.scrollRatio, (ratio) => {
-  const ta = textareaRef.value
-  if (!ta) return
-  const maxScroll = ta.scrollHeight - ta.clientHeight
-  if (maxScroll <= 0) return
-  const target = ratio * maxScroll
-  if (Math.abs(ta.scrollTop - target) < 1) return
-  syncingFromExternal.value = true
-  ta.scrollTop = target
-  requestAnimationFrame(() => {
-    syncingFromExternal.value = false
+  cancelAnimationFrame(scrollRafId)
+  scrollRafId = requestAnimationFrame(() => {
+    const ta = textareaRef.value
+    if (!ta) return
+    const maxScroll = ta.scrollHeight - ta.clientHeight
+    if (maxScroll <= 0) return
+    const target = ratio * maxScroll
+    if (Math.abs(ta.scrollTop - target) < 1) return
+    syncingFromExternal.value = true
+    ta.scrollTop = target
+    requestAnimationFrame(() => {
+      syncingFromExternal.value = false
+    })
   })
 })
 
@@ -381,7 +385,10 @@ function handleClickOutside(e) {
 }
 
 onMounted(() => document.addEventListener('click', handleClickOutside))
-onUnmounted(() => document.removeEventListener('click', handleClickOutside))
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+  cancelAnimationFrame(scrollRafId)
+})
 </script>
 
 <style scoped>
