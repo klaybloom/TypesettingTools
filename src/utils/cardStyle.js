@@ -13,6 +13,31 @@ export function createCardStyles(cardSettings) {
   const text = scheme.text
   const base = Number(cardSettings.fontSize) || 16
   const fam = font.stack
+  const templateId = cardSettings.templateId
+
+  const templateOverrides = {
+    simple: {
+      container: `font-family: ${fam}; color: ${text}; font-size: ${base}px; line-height: 1.8; letter-spacing: 0.15px; word-break: break-word;`,
+      h1: `font-family: ${fam}; font-size: ${base + 10}px; font-weight: 800; color: ${text}; margin: 0 0 ${base}px; padding-bottom: ${Math.round(base * 0.55)}px; border-bottom: 3px solid ${accent}; line-height: 1.32;`,
+      h2: `font-family: ${fam}; font-size: ${base + 4}px; font-weight: 700; color: ${text}; margin: ${base}px 0 ${Math.round(base * 0.55)}px; padding-left: 9px; border-left: 3px solid ${accent}; line-height: 1.42;`,
+      h3: `font-family: ${fam}; font-size: ${base + 1}px; font-weight: 700; color: ${accent}; margin: ${Math.round(base * 0.8)}px 0 ${Math.round(base * 0.45)}px;`,
+      blockquote: `background: transparent; border-left: 3px solid ${accent}; padding: 3px 0 3px 11px; margin: ${Math.round(base * 0.7)}px 0; color: ${text}; font-size: ${base - 1}px; line-height: 1.75; border-radius: 0;`
+    },
+    border: {
+      h1: `font-family: ${fam}; font-size: ${base + 10}px; font-weight: 800; color: ${accent}; margin: 0 0 ${base}px; line-height: 1.32; letter-spacing: 0.3px;`,
+      h2: `font-family: ${fam}; font-size: ${base + 4}px; font-weight: 700; color: ${text}; background: ${accent}12; margin: ${base}px 0 ${Math.round(base * 0.55)}px; padding: 5px 8px; border-radius: 5px; line-height: 1.42;`,
+      h3: `font-family: ${fam}; font-size: ${base + 1}px; font-weight: 700; color: ${accent}; margin: ${Math.round(base * 0.8)}px 0 ${Math.round(base * 0.45)}px;`,
+      blockquote: `background: ${accent}0d; border-left: 3px solid ${accent}; padding: 9px 11px; margin: ${Math.round(base * 0.7)}px 0; color: ${text}; font-size: ${base - 1}px; line-height: 1.7; border-radius: 0 6px 6px 0;`
+    },
+    handwrite: {
+      container: `font-family: ${fam}; color: ${text}; font-size: ${base}px; line-height: 1.82; letter-spacing: 0.35px; word-break: break-word;`,
+      h1: `font-family: ${fam}; font-size: ${base + 11}px; font-weight: 700; color: ${text}; margin: 0 0 ${base}px; padding-bottom: ${Math.round(base * 0.45)}px; border-bottom: 2px solid ${accent}99; line-height: 1.35;`,
+      h2: `font-family: ${fam}; font-size: ${base + 5}px; font-weight: 700; color: ${text}; margin: ${base}px 0 ${Math.round(base * 0.55)}px; line-height: 1.45;`,
+      h3: `font-family: ${fam}; font-size: ${base + 2}px; font-weight: 700; color: ${accent}; margin: ${Math.round(base * 0.8)}px 0 ${Math.round(base * 0.45)}px;`,
+      strong: `color: ${text}; font-weight: 800; text-decoration: underline; text-decoration-color: ${accent}88; text-decoration-thickness: 2px; text-underline-offset: 3px;`,
+      blockquote: `background: ${accent}0d; border-left: 2px solid ${accent}; padding: 8px 11px; margin: ${Math.round(base * 0.7)}px 0; color: ${text}; font-size: ${base - 1}px; line-height: 1.75; border-radius: 0 7px 7px 0;`
+    }
+  }[templateId] || {}
 
   return {
     // 套在内容容器上的基础排版（renderWithStyles 不含 section 包裹，由 CardCanvas 应用）
@@ -52,6 +77,8 @@ export function createCardStyles(cardSettings) {
     footnoteRef: `font-size: 0.75em; vertical-align: super; line-height: 0; color: ${accent}; text-decoration: none; font-weight: 600;`,
     footnoteSection: `margin-top: 16px; padding-top: 10px; border-top: 1px solid ${accent}33; font-size: ${base - 4}px; color: #8c8c8c; line-height: 1.5;`,
     footnoteItem: 'margin-bottom: 4px;',
-    footnoteBackRef: `font-size: 0.85em; color: ${accent}; text-decoration: none; margin-left: 4px;`
+    footnoteBackRef: `font-size: 0.85em; color: ${accent}; text-decoration: none; margin-left: 4px;`,
+
+    ...templateOverrides
   }
 }

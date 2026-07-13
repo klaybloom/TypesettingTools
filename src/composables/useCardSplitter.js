@@ -17,15 +17,9 @@
 import { onUnmounted, ref, watch } from 'vue'
 import { renderWithStyles } from '../utils/formatter.js'
 import { createCardStyles } from '../utils/cardStyle.js'
-import {
-  CARD_WIDTH,
-  CARD_HEIGHT,
-  CARD_PADDING,
-  getCardTemplate
-} from '../utils/cardTemplates.js'
-
-const HEADING_TAGS = new Set(['H1', 'H2', 'H3'])
-const MIN_HEADING_TAIL = 80 // 标题后至少要留这么多像素，否则提前换卡
+import { CARD_WIDTH, CARD_PADDING } from '../utils/cardTemplates.js'
+import { getCardContentBox } from '../utils/cardShell.js'
+import { splitCardBlocks } from '../utils/cardSplit.js'
 
 export function useCardSplitter(rawContent, cardSettings, enabled) {
   const cards = ref([]) // string[][]：外层=卡片，内层=该卡的块 outerHTML
@@ -48,14 +42,11 @@ export function useCardSplitter(rawContent, cardSettings, enabled) {
     }
 
     const settings = cardSettings.value
-    const template = getCardTemplate(settings.templateId)
     const styleMap = createCardStyles(settings)
     const html = renderWithStyles(text, styleMap)
 
     const contentWidth = CARD_WIDTH - CARD_PADDING * 2
-    const innerPad = template.id === 'simple' ? 0 : 0 // content wrapper 自身不额外加 padding，统一用 CARD_PADDING
-    const reserve = (template.reserveTop || 0) + (template.reserveBottom || 0)
-    const contentBox = CARD_HEIGHT - CARD_PADDING * 2 - reserve - innerPad
+    const contentBox = getCardContentBox(settings)
 
     // 离屏测量容器
     const measure = document.createElement('div')
@@ -83,59 +74,8 @@ export function useCardSplitter(rawContent, cardSettings, enabled) {
       // 已被更晚的运行取代则放弃
       if (token !== runToken) return
 
-      const blocks = Array.from(measure.children)
-
-      // 用 overflow:hidden 包裹逐块测高（纳入 margin）
-      const measured = blocks.map((block) => {
-        const wrap = document.createElement('div')
-        wrap.style.overflow = 'hidden'
-        block.replaceWith(wrap)
-        wrap.appendChild(block)
-        const h = wrap.offsetHeight
-        return { html: block.outerHTML, height: h, tag: block.tagName }
-      })
-
-      const result = []
-      let current = []
-      let used = 0
-      let anyOverflow = false
-
-      const pushCard = () => {
-        if (current.length) {
-          result.push(current)
-          current = []
-          used = 0
-        }
-      }
-
-      for (const item of measured) {
-        // 单块超过整卡：独占一卡，允许裁剪
-        if (item.height > contentBox) {
-          pushCard()
-          result.push([item.html])
-          anyOverflow = true
-          continue
-        }
-        // 放不下 → 换卡
-        if (used + item.height > contentBox && current.length) {
-          pushCard()
-        }
-        // 标题孤行守卫：标题落在卡底、剩余空间过小则提前换卡
-        if (
-          HEADING_TAGS.has(item.tag) &&
-          current.length &&
-          contentBox - used < MIN_HEADING_TAIL
-        ) {
-          pushCard()
-        }
-        current.push(item.html)
-        used += item.height
-      }
-      pushCard()
-
       if (token !== runToken) return
-      cards.value = result
-      overflowNotice.value = anyOverflow
+      cards.value = splitCardBlocks(measure, contentBox)
     } finally {
       measure.remove()
       if (token === runToken) splitting.value = false

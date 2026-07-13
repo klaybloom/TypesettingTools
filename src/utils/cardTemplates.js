@@ -39,7 +39,7 @@ const templates = {
     reserveTop: 26,
     reserveBottom: 26,
     frameInset: 16,
-    decoTop: { type: 'dots', label: 'NOTE' },
+    decoTop: { type: 'dots', label: '笔记' },
     decoBottom: { type: 'rule-date' },
     pageBg: (s) => stripeBg(s.accent),
     panelBg: () => '#ffffff',
@@ -54,35 +54,9 @@ const templates = {
     frameInset: 0,
     decoTop: null,
     decoBottom: null,
-    pageBg: () => '#ffffff',
-    panelBg: () => '#ffffff',
+    pageBg: () => '#fffef9',
+    panelBg: () => '#fffef9',
     panelStyle: ''
-  },
-
-  note: {
-    id: 'note',
-    name: '备忘',
-    reserveTop: 14,
-    reserveBottom: 14,
-    frameInset: 10,
-    decoTop: null,
-    decoBottom: null,
-    pageBg: (s) => s.page,
-    panelBg: (s) => s.page,
-    panelStyle: 'border-radius: 12px;'
-  },
-
-  twitter: {
-    id: 'twitter',
-    name: 'Twitter',
-    reserveTop: 42,
-    reserveBottom: 34,
-    frameInset: 0,
-    decoTop: { type: 'avatar' },
-    decoBottom: { type: 'meta' },
-    pageBg: () => '#ffffff',
-    panelBg: () => '#ffffff',
-    panelStyle: 'border: 1px solid #e1e8ed; border-radius: 14px;'
   },
 
   handwrite: {
@@ -96,19 +70,6 @@ const templates = {
     pageBg: (s) => s.page,
     panelBg: () => '#fffef9',
     panelStyle: 'border-radius: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.06);'
-  },
-
-  geometry: {
-    id: 'geometry',
-    name: '几何',
-    reserveTop: 38,
-    reserveBottom: 16,
-    frameInset: 12,
-    decoTop: { type: 'quote' },
-    decoBottom: null,
-    pageBg: (s) => `linear-gradient(135deg, ${s.accent}, ${s.accent}aa)`,
-    panelBg: () => 'rgba(255,255,255,0.96)',
-    panelStyle: 'border-radius: 12px;'
   }
 }
 

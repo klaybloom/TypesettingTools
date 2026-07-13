@@ -53,4 +53,14 @@ describe('createCardStyles', () => {
     const styles = createCardStyles({ ...defaultSettings, fontSize: 20 })
     expect(styles.p).toContain('margin: 0 0 14px') // 20 * 0.7 = 14
   })
+
+  it('applies distinct typography to the three retained card templates', () => {
+    const simple = createCardStyles({ ...defaultSettings, templateId: 'simple' })
+    const border = createCardStyles({ ...defaultSettings, templateId: 'border' })
+    const handwrite = createCardStyles({ ...defaultSettings, templateId: 'handwrite' })
+
+    expect(simple.h1).toContain('border-bottom: 3px solid #4C6EF5')
+    expect(border.h2).toContain('background: #4C6EF512')
+    expect(handwrite.strong).toContain('text-decoration: underline')
+  })
 })

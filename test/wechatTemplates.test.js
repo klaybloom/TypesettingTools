@@ -12,8 +12,8 @@ const settings = {
 }
 
 describe('wechatTemplates', () => {
-  it('exports 7 templates', () => {
-    expect(wechatTemplates).toHaveLength(7)
+  it('exports 3 retained templates', () => {
+    expect(wechatTemplates.map(tpl => tpl.id)).toEqual(['classic', 'band', 'program'])
   })
 
   it('each template has id, name, swatch, and build', () => {
@@ -27,9 +27,11 @@ describe('wechatTemplates', () => {
 })
 
 describe('getWechatTemplateOverrides', () => {
-  it('returns null for classic template', () => {
+  it('returns long-form reading overrides for classic template', () => {
     const overrides = getWechatTemplateOverrides('classic', settings)
-    expect(overrides).toBeNull()
+    expect(overrides).not.toBeNull()
+    expect(overrides.h1).toContain('border-bottom: 2px solid #1a73e8')
+    expect(overrides.h2).toContain('border-left: 4px solid #1a73e8')
   })
 
   it('returns null for unknown template id', () => {
@@ -37,29 +39,24 @@ describe('getWechatTemplateOverrides', () => {
     expect(overrides).toBeNull()
   })
 
-  it('returns style overrides for magazine template', () => {
-    const overrides = getWechatTemplateOverrides('magazine', settings)
+  it('returns style overrides for band template', () => {
+    const overrides = getWechatTemplateOverrides('band', settings)
     expect(overrides).not.toBeNull()
     expect(overrides).toHaveProperty('h1')
     expect(overrides).toHaveProperty('h2')
-    expect(overrides.h1).toContain('Georgia')
-    expect(overrides.h2).toContain('#333333')
+    expect(overrides.h1).toContain('#1a73e8')
+    expect(overrides.h2).toContain('#1a73e8')
   })
 
   it('overrides use the provided accentColor', () => {
-    const overrides = getWechatTemplateOverrides('warm', settings)
+    const overrides = getWechatTemplateOverrides('band', settings)
     expect(overrides.h1).toContain('#1a73e8')
     expect(overrides.blockquote).toContain('#1a73e8')
   })
 
-  it('mono-tech overrides include monospace codeblock', () => {
-    const overrides = getWechatTemplateOverrides('mono-tech', settings)
+  it('program overrides include monospace codeblock', () => {
+    const overrides = getWechatTemplateOverrides('program', settings)
     expect(overrides.codeblock).toContain('SF Mono')
     expect(overrides.inlineCode).toContain('SF Mono')
-  })
-
-  it('minimal overrides have no background on blockquote', () => {
-    const overrides = getWechatTemplateOverrides('minimal', settings)
-    expect(overrides.blockquote).toContain('background: none')
   })
 })

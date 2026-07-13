@@ -38,8 +38,8 @@ describe('cardTemplates constants', () => {
     })
   })
 
-  it('has 6 templates', () => {
-    expect(cardTemplates).toHaveLength(6)
+  it('has 3 retained templates', () => {
+    expect(cardTemplates.map(t => t.id)).toEqual(['border', 'simple', 'handwrite'])
   })
 })
 

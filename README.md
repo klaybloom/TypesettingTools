@@ -1,123 +1,103 @@
-# mdpress · Markdown 多模式内容创作工具
+# mdpress · Markdown 多端排版工具
 
-一款基于 Vue 3 + Vite 构建的 Markdown 内容创作工具，支持**原生预览**、**微信公众号排版**和**小红书卡片生成**三种模式，让 Markdown 写作一次、多端分发。
+mdpress 支持两种使用方式：
 
-## ✨ 功能特性
+1. **网页版编辑器**：在浏览器里编辑 Markdown、预览排版、复制公众号 HTML 或导出小红书图片。
+2. **本地 Codex Skill**：对已有 Markdown 文件直接生成公众号内联 HTML 和小红书 1080×1440 图片，不改写原文。
 
-### 📝 Markdown 编辑
-- 基于 **markdown-it** 的解析引擎，完整支持 GFM 语法
-- 左侧编辑器常驻，右侧三种预览模式实时联动
-- 支持标题、列表、引用、表格、脚注、任务列表、代码块等格式
-- 集成 **highlight.js** 代码语法高亮
-- 撤销 / 重做历史、Markdown 工具栏
+## 网页版功能
 
-### 👁 原生预览
-- GitHub 风格的干净文档排版
-- 支持桌面 / 手机宽度切换
-- 导出为长截图（PNG）或 PDF
+- Markdown 原生预览、微信公众号排版、小红书卡片三种模式
+- 公众号模板：`classic`、`program`、`band`
+- 小红书模板：`simple`、`border`、`handwrite`
+- 支持标题、列表、引用、表格、脚注、任务列表、代码块和图片
+- 公众号内容可复制为内联样式 HTML；小红书长文自动拆成连续卡片
+- 支持深浅色界面、字号、配色、字体和行距设置
 
-### 📱 公众号排版
-- 移动端宽度模拟器预览，贴近公众号实际效果
-- **7 套公众号模板**：经典、杂志、极简、极客、暖阳、色块、程序
-- 模板覆盖完整标题体系、引用、分割线，切换差异一目了然
-- 自定义正文字号、行间距、正文色、强调色、首行缩进
-- 悬浮样式面板，鼠标悬浮即可切换模板与参数
-- **一键复制**为内联样式 HTML，直接粘贴到公众号后台编辑器
-- 导出为图片或 PDF
-
-### 🖼 小红书卡片
-- **自动拆卡引擎**：长文自动拆分为多张 3:4 竖版卡片
-- 离屏测量 + 贪心装箱算法，智能避免在段落中间断页
-- **6 套卡片模板**：边框、简约、备忘、Twitter、手写、几何
-- 6 种配色方案 + 4 种字体风格 + 字号滑杆
-- 翻页滑杆浏览全部卡片
-- 单张 / 全部导出 1080×1440 高清 PNG
-
-### 🎨 界面
-- 深色 / 浅色模式切换
-- 右侧框内 Tab 切换，编辑器常驻不丢失上下文
-- 导出菜单下拉，头部按钮精简不杂乱
-
-## 🛠️ 技术栈
-
-| 技术 | 说明 |
-|------|------|
-| **Vue 3** | 前端框架 |
-| **Vite 5** | 构建工具 |
-| **markdown-it** | Markdown 解析引擎 |
-| **highlight.js** | 代码语法高亮 |
-| **html2canvas** | 页面截图导出 |
-
-## 🚀 快速开始
-
-### 安装依赖
+## 网页版运行
 
 ```bash
 npm install
-```
-
-### 启动开发服务器
-
-```bash
 npm run dev
 ```
 
-### 构建生产版本
-
-```bash
-npm run build
-```
-
-### 运行测试
+打开终端显示的本地地址即可使用。测试命令：
 
 ```bash
 npm test
 ```
 
-## 📁 项目结构
+## 本地命令行发布器
 
-```
-src/
-├── App.vue                            # 主应用容器
-├── main.js                            # 应用入口
-├── components/
-│   ├── Editor.vue                     # Markdown 编辑器
-│   ├── NativePreview.vue              # 原生 Markdown 预览
-│   ├── Preview.vue                    # 公众号桌面/手机预览
-│   ├── CardCanvas.vue                 # 小红书卡片渲染
-│   ├── CardPane.vue                   # 卡片翻页 + 预览
-│   ├── CardExportSurface.vue          # 卡片离屏导出画布
-│   ├── WechatPane.vue                 # 公众号预览容器
-│   ├── ExportSurface.vue              # 文章离屏导出画布
-│   ├── PrintSurface.vue               # PDF 打印画布
-│   ├── ExportMenu.vue                 # 导出下拉菜单
-│   └── SettingsPopover.vue            # 悬浮样式设置面板
-├── composables/
-│   ├── useAppearance.js               # 深浅模式
-│   ├── useClipboardHtml.js            # HTML 富文本复制
-│   ├── useHistory.js                  # 撤销/重做历史
-│   ├── useImageExport.js              # 长图/PNG 导出
-│   ├── useCardSplitter.js             # 小红书自动拆卡引擎
-│   ├── useCardSettings.js             # 卡片设置持久化
-│   ├── useViewMode.js                 # 视图模式状态
-│   ├── usePersistentStyleSettings.js  # 排版设置持久化
-│   ├── useRenderedDocument.js         # Markdown → HTML 渲染
-│   └── useToast.js                    # 全局轻提示
-├── styles/
-│   ├── base.css                       # 基础重置
-│   ├── variables.css                  # 主题 CSS 变量
-│   ├── native-preview.css             # 原生预览样式
-│   └── print.css                      # 打印/PDF 样式
-└── utils/
-    ├── articleStyle.js                # 文章内联样式表
-    ├── cardStyle.js                   # 卡片样式引擎
-    ├── cardTemplates.js               # 卡片模板与配色
-    ├── config.js                      # 默认配置
-    ├── formatter.js                   # markdown-it 渲染管线
-    ├── wechatTemplates.js             # 公众号模板系统
-    └── punctuation.js                 # 中文标点规范化
+命令行直接读取 `.md` 文件，不调用模型改写内容：
+
+```bash
+node scripts/mdpress-publish.mjs /absolute/path/article.md \
+  --out /absolute/path/output \
+  --wechat-template classic \
+  --xhs-template border \
+  --xhs-color red \
+  --xhs-font hand \
+  --xhs-font-size 16 \
+  --asset-base-url https://cdn.example.com/assets/
 ```
 
-## 📄 License
+默认输出到 Markdown 同目录的 `mdpress-output/<文件名>/`：
+
+- `wechat.html`：可粘贴到公众号编辑器的内联样式 HTML
+- `xhs/001.png`、`xhs/002.png`…：1080×1440 小红书图片
+- `manifest.json`：生成参数与文件清单
+
+常用参数：
+
+```text
+--targets wechat,xhs       仅生成指定目标，默认两个都生成
+--force                    覆盖已有输出目录
+--wechat-template          classic | program | band
+--xhs-template             simple | border | handwrite
+--xhs-color                blue | orange | teal | red | green | purple
+--xhs-font                 hand | sans | serif | round
+--xhs-font-size            13 到 22
+```
+
+公众号 Markdown 含本地图片时，必须提供 `--asset-base-url`，让相对路径映射为可访问的 HTTPS 地址。小红书图片可直接读取 Markdown 同目录的本地图片。首次生成小红书图片前，需要安装 Playwright Chromium：
+
+```bash
+npx playwright install chromium
+```
+
+表格、代码块或单张图片高于一张卡片的可用高度时，命令会停止并说明原因，不会输出被裁切的图片。
+
+## 安装为本地 Codex Skill
+
+此仓库包含 `mdpress-publisher` skill。克隆仓库并安装依赖后，运行：
+
+```bash
+node scripts/install-mdpress-skill.mjs
+```
+
+它会将 skill 安装到 `~/.codex/skills/mdpress-publisher/`，并记录当前仓库的绝对路径。若要覆盖已有同名 skill：
+
+```bash
+node scripts/install-mdpress-skill.mjs --force
+```
+
+之后在 Codex 中可以直接提出“使用 `mdpress-publisher` 生成这个 Markdown 的公众号 HTML 和小红书图片”。skill 只调用本地命令，不上传图片、不调用公众号素材库、不发布到任何平台。
+
+## 项目结构
+
+```text
+src/                         网页编辑器与共享排版模块
+scripts/mdpress-publish.mjs  本地 Markdown 发布命令
+scripts/install-mdpress-skill.mjs
+skills/mdpress-publisher/    可安装的 Codex skill 模板
+test/                        单元与命令行集成测试
+```
+
+## 技术栈
+
+Vue 3、Vite、markdown-it、highlight.js、Playwright、html2canvas。
+
+## License
 
 MIT
