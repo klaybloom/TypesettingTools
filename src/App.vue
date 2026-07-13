@@ -1,6 +1,6 @@
 <template>
   <div class="app-container" :data-mode="colorMode" :data-layout="effectiveLayout">
-    <!-- 顶部导航栏：logo · tabs · 动作按钮 -->
+    <!-- 顶部导航栏：品牌 · 全局动作 -->
     <header class="app-header">
       <div class="header-brand">
         <svg class="logo-icon" viewBox="0 0 24 24" width="22" height="22">
@@ -8,16 +8,6 @@
         </svg>
         <h1 class="app-title">mdpress</h1>
       </div>
-
-      <nav class="mode-tabs">
-        <button
-          v-for="tab in modeTabs"
-          :key="tab.id"
-          class="mode-btn"
-          :class="{ active: viewMode === tab.id }"
-          @click="setViewMode(tab.id)"
-        >{{ tab.label }}</button>
-      </nav>
 
       <div class="header-actions">
         <!-- 布局切换：单栏 / 双栏（窄屏强制单栏时隐藏） -->
@@ -35,51 +25,6 @@
             <path fill="currentColor" d="M5 5h14a1 1 0 011 1v12a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1zm1 2v10h12V7H6z"/>
           </svg>
         </button>
-
-        <!-- 预览 -->
-        <template v-if="viewMode === 'preview'">
-          <ExportMenu :items="previewExportItems" :disabled="!nativeContent || isExporting" @select="onExport" />
-        </template>
-
-        <!-- 公众号：桌面/手机 + 样式 + 复制 + 导出 -->
-        <template v-else-if="viewMode === 'wechat'">
-          <div class="device-toggle">
-            <button class="device-btn" :class="{ active: previewMode === 'desktop' }" @click="previewMode = 'desktop'" title="桌面预览" aria-label="桌面预览">
-              <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/></svg>
-            </button>
-            <button class="device-btn" :class="{ active: previewMode === 'mobile' }" @click="previewMode = 'mobile'" title="手机预览" aria-label="手机预览">
-              <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
-            </button>
-          </div>
-          <SettingsPopover
-            mode="wechat"
-            :wechat-settings="articleStyleSettings"
-            :card-settings="cardSettings"
-            @update:wechat-settings="articleStyleSettings = $event"
-            @update:card-settings="cardSettings = $event"
-          />
-          <button class="action-btn primary" @click="copyHtml" :disabled="!formattedContent">
-            <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-            {{ copySuccess ? '已复制' : '复制' }}
-          </button>
-          <ExportMenu :items="wechatExportItems" :disabled="!formattedContent || isExporting" @select="onExport" />
-        </template>
-
-        <!-- 小红书：样式 + 复制图片 + 导出 -->
-        <template v-else-if="viewMode === 'xhs'">
-          <SettingsPopover
-            mode="xhs"
-            :wechat-settings="articleStyleSettings"
-            :card-settings="cardSettings"
-            @update:wechat-settings="articleStyleSettings = $event"
-            @update:card-settings="cardSettings = $event"
-          />
-          <button class="action-btn primary" @click="copyCardImage" :disabled="!cards.length || cardExporting">
-            <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-            复制图片
-          </button>
-          <ExportMenu :items="cardExportItems" :disabled="!cards.length || cardExporting" @select="onExport" />
-        </template>
 
         <button
           class="icon-btn mode-toggle"
@@ -120,6 +65,24 @@
       </template>
 
       <section class="preview-section">
+        <PreviewToolbar
+          :mode-tabs="modeTabs"
+          :view-mode="viewMode"
+          :layout="effectiveLayout"
+          :preview-mode="previewMode"
+          :wechat-settings="articleStyleSettings"
+          :card-settings="cardSettings"
+          :export-items="activeExportItems"
+          :export-disabled="toolbarExportDisabled"
+          :copy-disabled="toolbarCopyDisabled"
+          :copy-success="copySuccess"
+          @select-mode="setViewMode"
+          @update:preview-mode="previewMode = $event"
+          @update:wechat-settings="articleStyleSettings = $event"
+          @update:card-settings="cardSettings = $event"
+          @copy="onToolbarCopy"
+          @export="onExport"
+        />
         <Editor
           v-if="effectiveLayout === 'single' && viewMode === 'edit'"
           v-model="rawContent"
@@ -171,12 +134,11 @@ import { computed, nextTick, ref, watch } from 'vue'
 import CardExportSurface from './components/CardExportSurface.vue'
 import CardPane from './components/CardPane.vue'
 import Editor from './components/Editor.vue'
-import ExportMenu from './components/ExportMenu.vue'
 import ExportSurface from './components/ExportSurface.vue'
 import NativePreview from './components/NativePreview.vue'
 import Preview from './components/Preview.vue'
+import PreviewToolbar from './components/PreviewToolbar.vue'
 import PrintSurface from './components/PrintSurface.vue'
-import SettingsPopover from './components/SettingsPopover.vue'
 import { defaultArticleStyleSettings } from './utils/config.js'
 import { useAppearance } from './composables/useAppearance.js'
 import { useCardSettings } from './composables/useCardSettings.js'
@@ -237,6 +199,30 @@ const cardExportItems = [
   { key: 'card-current', label: '导出当前卡片', icon: 'card' },
   { key: 'card-all', label: '导出全部卡片', icon: 'cards' }
 ]
+
+const activeExportItems = computed(() => {
+  if (viewMode.value === 'xhs') return cardExportItems
+  if (viewMode.value === 'edit') return []
+  return previewExportItems
+})
+
+const toolbarExportDisabled = computed(() => {
+  if (viewMode.value === 'preview') return !nativeContent.value || isExporting.value
+  if (viewMode.value === 'wechat') return !formattedContent.value || isExporting.value
+  if (viewMode.value === 'xhs') return !cards.value.length || cardExporting.value
+  return true
+})
+
+const toolbarCopyDisabled = computed(() => {
+  if (viewMode.value === 'wechat') return !formattedContent.value
+  if (viewMode.value === 'xhs') return !cards.value.length || cardExporting.value
+  return true
+})
+
+function onToolbarCopy() {
+  if (viewMode.value === 'wechat') return copyHtml()
+  if (viewMode.value === 'xhs') return copyCardImage()
+}
 
 function onExport(key) {
   if (key === 'image') return exportImage()

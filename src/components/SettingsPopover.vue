@@ -1,6 +1,11 @@
 <template>
   <div ref="triggerRef" class="settings-trigger" @mouseenter="openNow" @mouseleave="closeSoon">
-    <button class="action-btn style-btn" title="样式">
+    <button
+      class="action-btn style-btn"
+      title="样式"
+      :aria-expanded="show"
+      @click.stop="toggleNow"
+    >
       <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67 0 1.38-1.12 2.5-2.5 2.5zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .5-.22.5-.5 0-.16-.08-.28-.14-.35-.41-.46-.63-1.05-.63-1.65 0-1.38 1.12-2.5 2.5-2.5H16c2.21 0 4-1.79 4-4 0-3.86-3.59-7-8-7zM6.5 11.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-4C8.67 7.5 8 6.83 8 6s.67-1.5 1.5-1.5S11 5.17 11 6s-.67 1.5-1.5 1.5zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 4.5 14.5 4.5 16 5.17 16 6s-.67 1.5-1.5 1.5zm3 4c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
       <span class="btn-label">样式</span>
     </button>
@@ -136,11 +141,30 @@ const show = ref(false)
 const triggerRef = ref(null)
 const cardRef = ref(null)
 const cardStyle = ref({})
+const externalAnchor = ref(null)
 let closeTimer = null
 
 function openNow() {
   clearTimeout(closeTimer)
+  externalAnchor.value = null
   show.value = true
+}
+
+function openAt(rect) {
+  clearTimeout(closeTimer)
+  externalAnchor.value = rect
+  show.value = true
+}
+
+function closeNow() {
+  clearTimeout(closeTimer)
+  show.value = false
+  externalAnchor.value = null
+}
+
+function toggleNow() {
+  if (show.value) closeNow()
+  else openNow()
 }
 
 function closeSoon() {
@@ -152,8 +176,8 @@ watch(show, (v) => {
   if (v) {
     nextTick(() => {
       const el = triggerRef.value
-      if (!el) return
-      const r = el.getBoundingClientRect()
+      const r = externalAnchor.value || el?.getBoundingClientRect()
+      if (!r) return
       cardStyle.value = {
         top: Math.min(r.bottom + 8, window.innerHeight - 400) + 'px',
         right: Math.max(window.innerWidth - r.right - 8, 8) + 'px'
@@ -179,6 +203,8 @@ function isPresetActive(preset) {
     (key) => props.wechatSettings[key] === preset.settings[key]
   )
 }
+
+defineExpose({ openAt, close: closeNow })
 </script>
 
 <style scoped>

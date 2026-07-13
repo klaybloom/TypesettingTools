@@ -113,6 +113,10 @@ function handleScroll(e) {
   justify-content: center;
 }
 
+.preview-wrapper.mobile {
+  align-items: center;
+}
+
 /* 手机模拟器 */
 .device-frame {
   width: 332px;
